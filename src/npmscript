@@ -1,0 +1,38 @@
+-- react shop 프로젝트생성
+npx create-react-app shop
+
+--react-router-dom 설치
+npm install react-router-dom@6
+
+--styled-components  설치
+npm install styled-components
+
+-- redux toolkit 설치
+npm install @reduxjs/toolkit@1.8.1 react-redux
+
+-- react-query 설치
+npm install react-query@3
+
+--크롬 확장프로그램
+React Developer Tools
+https://chrome.google.com/webstore/
+크롬 웹스토어 들어가면 확장프로그램 설치가 가능합니다.
+여기서 React Developer Tools 설치하면 Components 탭이 생기는데
+여러분들이 개발중인 리액트사이트를 컴포넌트로 미리볼 수 있습니다.
+
+Redux Developer Tools
+이것도 크롬 웹스토어에서 설치가능합니다.
+Redux store에 있던 state를 전부 확인가능합니다.
+그리고 dispatch 날릴 때 마다 뭐가 어떻게 바뀌었는지 로그를 작성해줍니다.
+store 복잡해지면 유용함
+
+scss 적용하기
+설치 명령어
+$npm i sass
+
+Material-UI 설치
+먼저 Material-UI 패키지를 설치합니다.
+
+bash
+코드 복사
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
