@@ -1,45 +1,59 @@
 // src/pages/home/Home.js
 import React from 'react';
-import { Container, Grid, Card, CardContent, CardMedia, Typography, Button } from '@mui/material';
+import {Container, Grid, Card, CardContent, CardMedia, Typography, Button, CircularProgress} from '@mui/material';
 import { Banner } from '../../components/styles';
+import {fetchLatestGoods} from "../../api";
+import {useQuery} from "react-query";
+import {Link as RouterLink} from "react-router-dom";
 
 function Home() {
-    const products = [
-        { id: 1, name: 'Product 1', image: 'https://via.placeholder.com/150', description: 'This is product 1.' },
-        { id: 2, name: 'Product 2', image: 'https://via.placeholder.com/150', description: 'This is product 2.' },
-        { id: 3, name: 'Product 3', image: 'https://via.placeholder.com/150', description: 'This is product 3.' },
-    ];
+    const { data, error, isLoading } = useQuery(['goods'], () => fetchLatestGoods(),{ keepPreviousData: true });
+
+    const goods = data;
+    console.log(data);
 
     return (
         <Container maxWidth="lg">
             {/* 배너 섹션 */}
             <Banner>
                 <Typography variant="h2" component="h1">
-                    Welcome to Our Shopping Mall
+                    WELCOME
                 </Typography>
             </Banner>
 
             <Typography variant="h3" component="h2" gutterBottom>
-                Latest Trends
+                최근게시물
             </Typography>
 
             <Grid container spacing={4}>
-                {products.map((product) => (
-                    <Grid item key={product.id} xs={12} sm={6} md={4}>
-                        <Card>
-                            <CardMedia component="img" alt={product.name} height="140" image={product.image} />
-                            <CardContent>
-                                <Typography variant="h5" component="div">
-                                    {product.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {product.description}
-                                </Typography>
-                            </CardContent>
-                            <Button size="small">Learn More</Button>
-                        </Card>
-                    </Grid>
-                ))}
+                {   isLoading
+                    ?
+                    <CircularProgress />
+                    : ( error
+                        ?
+                            <Typography>Error fetching goods</Typography>
+                        :
+                            data.goods.map((good) => (
+                                <Grid item key={good.GOODS_NO} xs={12} sm={6} md={4}>
+                                    <Card>
+                                        <CardMedia component="img" alt={good.GOODS_NAME} height="140" image={good.GOODS_THUMBNAIL} />
+                                        <CardContent>
+                                            <Typography variant="h5" component="div">
+                                                {good.GOODS_NAME}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {good.GOODS_CONTENT}
+                                            </Typography>
+                                        </CardContent>
+                                        <Button size="small" component={RouterLink} to={`/goods/${good.GOODS_NO}`}>
+                                            Learn More
+                                        </Button>
+                                    </Card>
+                                </Grid>
+                            ))
+                        )
+                }
+
             </Grid>
         </Container>
     );

@@ -3,6 +3,11 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
+export const fetchLatestGoods = async () => {
+    const response = await axios.get(`${API_URL}/goods/latest`);
+    return response.data;
+};
+
 export const fetchGoods = async (page = 1, limit = 10) => {
     const response = await axios.get(`${API_URL}/goods`, {
         params: {
