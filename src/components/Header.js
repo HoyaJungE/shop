@@ -1,85 +1,109 @@
 // src/components/Header.js
-import React, { useState, useContext } from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Button, Box } from '@mui/material';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { fetchMenus, buildMenuTree } from '../api';
+import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Link, Box } from '@mui/material';
 import AuthContext from '../context/AuthContext';
 
-function Header() {
-    const [anchorEl, setAnchorEl] = useState(null);
+const Header = () => {
     const { user, logout } = useContext(AuthContext);
-    const navigate = useNavigate();
+    const [menus, setMenus] = useState([]);
+    const [menuAnchor, setMenuAnchor] = useState(null);
+    const [selectedMenu, setSelectedMenu] = useState(null);
 
-    const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
+    useEffect(() => {
+        const loadMenus = async () => {
+            try {
+                const data = await fetchMenus();
+                const menuTree = buildMenuTree(data);
+                setMenus(menuTree);
+            } catch (error) {
+                console.error('Failed to fetch menus:', error);
+                setMenus([]);
+            }
+        };
+        loadMenus();
+    }, []);
+
+    const handleMenuOpen = (event, menu) => {
+        setMenuAnchor(event.currentTarget);
+        setSelectedMenu(menu);
     };
 
-    const handleClose = () => {
-        setAnchorEl(null);
+    const handleMenuClose = () => {
+        setMenuAnchor(null);
+        setSelectedMenu(null);
     };
 
-    const handleLogout = () => {
-        logout();
-        handleClose();
-        navigate('/login');
-    };
+    const renderMenu = (menu) => (
+        <MenuItem key={menu.MENU_NO} component={RouterLink} to={menu.MENU_URL} onClick={handleMenuClose}>
+            {menu.MENU_NAME}
+            {menu.children.length > 0 && (
+                <Menu
+                    anchorEl={menuAnchor}
+                    open={Boolean(menuAnchor && selectedMenu === menu)}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                >
+                    {menu.children.map(child => renderMenu(child))}
+                </Menu>
+            )}
+        </MenuItem>
+    );
 
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography variant="h6" component={RouterLink} to="/" style={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
-                    Shopping
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    <Link component={RouterLink} to="/" color="inherit" underline="none">
+                        Shopping
+                    </Link>
                 </Typography>
-                <Button color="inherit" component={RouterLink} to="/goods" style={{ marginRight: 'auto' }}>
-                    Goods
-                </Button>
-                <div>
-                    {user ? (
-                        <>
-                            <IconButton
-                                edge="end"
-                                color="inherit"
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleMenu}
-                            >
-                                <AccountCircleIcon />
-                            </IconButton>
+                {menus.map(menu => (
+                    <Box key={menu.MENU_NO} sx={{ ml: 2 }}>
+                        <Button
+                            color="inherit"
+                            onClick={(e) => handleMenuOpen(e, menu)}
+                        >
+                            {menu.MENU_NAME}
+                        </Button>
+                        {menu.children.length > 0 && (
                             <Menu
-                                id="menu-appbar"
-                                anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorEl)}
-                                onClose={handleClose}
+                                anchorEl={menuAnchor}
+                                open={Boolean(menuAnchor && selectedMenu === menu)}
+                                onClose={handleMenuClose}
+                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                             >
-                                <MenuItem onClick={handleLogout}>
-                                    Logout
-                                </MenuItem>
+                                {menu.children.map(child => renderMenu(child))}
                             </Menu>
-                        </>
-                    ) : (
-                        <>
-                            <Button color="inherit" component={RouterLink} to="/login">
-                                Login
-                            </Button>
-                            <Button color="inherit" component={RouterLink} to="/signup">
-                                Sign Up
-                            </Button>
-                        </>
-                    )}
-                </div>
+                        )}
+                    </Box>
+                ))}
+                {user && (
+                    <>
+                        <Button color="inherit" component={RouterLink} to="/add-menu">
+                            Add Menu
+                        </Button>
+                        <Button color="inherit" onClick={logout}>
+                            Logout
+                        </Button>
+                    </>
+                )}
+                {!user && (
+                    <>
+                        <Button color="inherit" component={RouterLink} to="/login">
+                            Login
+                        </Button>
+                        <Button color="inherit" component={RouterLink} to="/signup">
+                            Sign Up
+                        </Button>
+                    </>
+                )}
             </Toolbar>
         </AppBar>
     );
-}
+};
 
 export default Header;

@@ -58,8 +58,7 @@ function AddGoods() {
             </Typography>
             {error && <Typography color="error">{error}</Typography>}
             <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Category"
+                <TextField label="Category"
                     name="GOODS_CATEGORY"
                     value={goods.GOODS_CATEGORY}
                     onChange={handleChange}

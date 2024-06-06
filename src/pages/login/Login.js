@@ -9,7 +9,7 @@ import AuthContext from '../../context/AuthContext';
 const API_URL = 'http://localhost:5000/api'; // 서버 API URL
 
 async function loginUser(credentials) {
-    const response = await axios.post(`${API_URL}/login`, credentials);
+    const response = await axios.post(`${API_URL}/auth/login`, credentials);
     return response.data;
 }
 
