@@ -9,11 +9,12 @@ import AddGoods from './pages/board/AddGoods';
 import EditGoods from './pages/board/EditGoods';
 import GoodDetail from './pages/board/GoodDetail';
 import MenuList from './pages/menu/MenuList';
-import AddMenu from './pages/menu/AddMenu';
-import EditMenu from './pages/menu/EditMenu';
+import MenuDetail from './pages/menu/MenuDetail';
+import EditMenu from './pages/menu/EditMenu'; // Update import
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
+import AddMenu from "./pages/menu/AddMenu";
 
 function App() {
     return (
@@ -30,7 +31,8 @@ function App() {
                     <Route path="goods/:id" element={<GoodDetail />} />
                     <Route path="menus" element={<MenuList />} />
                     <Route path="add-menu" element={<AddMenu />} />
-                    <Route path="edit-menu/:id" element={<EditMenu />} />
+                    <Route path="menu/:id" element={<MenuDetail />} />
+                    <Route path="edit-menu/:id" element={<EditMenu />} /> {/* Update route */}
                 </Routes>
                 <Footer />
             </Router>

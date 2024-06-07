@@ -4,7 +4,7 @@ import { Box } from '@mui/material';
 
 export const Banner = styled(Box)(({ theme }) => ({
     height: '300px',
-    backgroundImage: 'url("https://via.placeholder.com/1200x300")',
+    backgroundImage: 'url("/images/banner.png")',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     display: 'flex',

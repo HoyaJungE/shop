@@ -9,9 +9,6 @@ import {Link as RouterLink} from "react-router-dom";
 function Home() {
     const { data, error, isLoading } = useQuery(['goods'], () => fetchLatestGoods(),{ keepPreviousData: true });
 
-    const goods = data;
-    console.log(data);
-
     return (
         <Container maxWidth="lg">
             {/* 배너 섹션 */}

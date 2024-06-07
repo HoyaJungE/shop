@@ -1,6 +1,5 @@
-// src/components/Header.js
 import React, { useContext, useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { fetchMenus, buildMenuTree } from '../api';
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Link, Box } from '@mui/material';
 import AuthContext from '../context/AuthContext';
@@ -10,6 +9,7 @@ const Header = () => {
     const [menus, setMenus] = useState([]);
     const [menuAnchor, setMenuAnchor] = useState(null);
     const [selectedMenu, setSelectedMenu] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadMenus = async () => {
@@ -35,10 +35,24 @@ const Header = () => {
         setSelectedMenu(null);
     };
 
+    const handleMenuClick = (menu) => {
+        handleMenuClose();
+        console.log(menu.MENU_TYPE);
+        navigate(menu.MENU_URL);
+        if (menu.MENU_TYPE === 1) {
+            navigate(menu.MENU_URL);
+        }
+    };
+
     const renderMenu = (menu) => (
-        <MenuItem key={menu.MENU_NO} component={RouterLink} to={menu.MENU_URL} onClick={handleMenuClose}>
+        <MenuItem
+            key={menu.MENU_NO}
+            onClick={() => handleMenuClick(menu)}
+            component={menu.MENU_TYPE === 1 ? RouterLink : 'div'}
+            to={menu.MENU_TYPE === 1 ? menu.MENU_URL : ''}
+        >
             {menu.MENU_NAME}
-            {menu.children.length > 0 && (
+            {menu.children && menu.children.length > 0 && (
                 <Menu
                     anchorEl={menuAnchor}
                     open={Boolean(menuAnchor && selectedMenu === menu)}
@@ -60,32 +74,30 @@ const Header = () => {
                         Shopping
                     </Link>
                 </Typography>
-                {menus.map(menu => (
-                    <Box key={menu.MENU_NO} sx={{ ml: 2 }}>
-                        <Button
-                            color="inherit"
-                            onClick={(e) => handleMenuOpen(e, menu)}
-                        >
-                            {menu.MENU_NAME}
-                        </Button>
-                        {menu.children.length > 0 && (
-                            <Menu
-                                anchorEl={menuAnchor}
-                                open={Boolean(menuAnchor && selectedMenu === menu)}
-                                onClose={handleMenuClose}
-                                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                {menus.length > 0 && (
+                    <Box>
+                        {menus.map(menu => (
+                            <Button
+                                key={menu.MENU_NO}
+                                color="inherit"
+                                onClick={(e) => handleMenuOpen(e, menu)}
                             >
-                                {menu.children.map(child => renderMenu(child))}
-                            </Menu>
-                        )}
+                                {menu.MENU_NAME}
+                            </Button>
+                        ))}
+                        <Menu
+                            anchorEl={menuAnchor}
+                            open={Boolean(menuAnchor)}
+                            onClose={handleMenuClose}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                        >
+                            {selectedMenu && selectedMenu.children.map(child => renderMenu(child))}
+                        </Menu>
                     </Box>
-                ))}
+                )}
                 {user && (
                     <>
-                        <Button color="inherit" component={RouterLink} to="/add-menu">
-                            Add Menu
-                        </Button>
                         <Button color="inherit" onClick={logout}>
                             Logout
                         </Button>

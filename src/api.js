@@ -1,4 +1,3 @@
-// src/api.js
 import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
@@ -35,6 +34,11 @@ export const updateGoods = async (goods) => {
 
 export const fetchMenus = async () => {
     const response = await axios.get(`${API_URL}/menu`);
+    return response.data;
+};
+
+export const fetchMenuById = async (id) => {
+    const response = await axios.get(`${API_URL}/menu/${id}`);
     return response.data;
 };
 
