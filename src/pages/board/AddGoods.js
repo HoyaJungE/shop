@@ -38,7 +38,7 @@ function AddGoods() {
             formData.append(key, goods[key]);
         });
         if (goodsImg) {
-            formData.append('GOODS_IMG', goodsImg);
+            formData.append('FILE_NO', goodsImg);
         }
 
         try {
@@ -59,11 +59,11 @@ function AddGoods() {
             {error && <Typography color="error">{error}</Typography>}
             <form onSubmit={handleSubmit}>
                 <TextField label="Category"
-                    name="GOODS_CATEGORY"
-                    value={goods.GOODS_CATEGORY}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
+                           name="GOODS_CATEGORY"
+                           value={goods.GOODS_CATEGORY}
+                           onChange={handleChange}
+                           fullWidth
+                           margin="normal"
                 />
                 <TextField
                     label="Name"
@@ -131,7 +131,7 @@ function AddGoods() {
                 />
                 <Input
                     type="file"
-                    name="GOODS_IMG"
+                    name="FILE_NO"
                     onChange={handleFileChange}
                     fullWidth
                     margin="normal"

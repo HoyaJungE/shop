@@ -1,4 +1,3 @@
-// src/components/Header.js
 import React, { useContext, useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { fetchMenus, buildMenuTree } from '../api';
@@ -34,6 +33,7 @@ const Header = () => {
         const loadMenus = async () => {
             try {
                 const data = await fetchMenus();
+                console.log('Fetched menus:', data);
                 const menuTree = buildMenuTree(data);
                 setMenus(menuTree);
             } catch (error) {
@@ -65,8 +65,8 @@ const Header = () => {
         <MenuItem
             key={menu.MENU_NO}
             onClick={() => handleMenuClick(menu)}
-            component={menu.MENU_TYPE === '1' ? RouterLink : 'div'}
-            to={menu.MENU_TYPE === '1' ? menu.MENU_URL : ''}
+            component={menu.MENU_TYPE === 1 ? RouterLink : 'div'}
+            to={menu.MENU_TYPE === 1 ? menu.MENU_URL : ''}
         >
             {menu.MENU_NAME}
             {menu.children && menu.children.length > 0 && (
@@ -116,9 +116,6 @@ const Header = () => {
                     )}
                     {user && (
                         <>
-                            <Button color="inherit" component={RouterLink} to="/add-menu">
-                                Add Menu
-                            </Button>
                             <Button color="inherit" onClick={logout}>
                                 Logout
                             </Button>

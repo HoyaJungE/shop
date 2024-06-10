@@ -16,6 +16,7 @@ function EditGoods() {
         GOODS_DATE: '',
         GOODS_KEYWORD: '',
         GOODS_THUMBNAIL: '',
+        FILE_NO: ''
     });
     const [goodsImg, setGoodsImg] = useState(null);
     const [error, setError] = useState('');
@@ -45,7 +46,7 @@ function EditGoods() {
             formData.append(key, goods[key]);
         });
         if (goodsImg) {
-            formData.append('GOODS_IMG', goodsImg);
+            formData.append('file', goodsImg); // Update the key to 'file' to match the backend
         }
 
         try {
@@ -139,7 +140,7 @@ function EditGoods() {
                 />
                 <Input
                     type="file"
-                    name="GOODS_IMG"
+                    name="file"
                     onChange={handleFileChange}
                     fullWidth
                     margin="normal"

@@ -2,8 +2,12 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
-export const fetchLatestGoods = async () => {
-    const response = await axios.get(`${API_URL}/goods/latest`);
+export const fetchLatestGoods = async (cnt = 3) => {
+    const response = await axios.get(`${API_URL}/goods/latest`, {
+        params: {
+            cnt,
+        },
+    });
     return response.data;
 };
 
@@ -74,4 +78,22 @@ export const buildMenuTree = (menus) => {
     });
 
     return roots;
+};
+
+export const fetchFileCount = async (fileNo) => {
+    const response = await axios.get(`${API_URL}/files/count`, {
+        params: {
+            fileNo,
+        },
+    });
+    return response.data;
+};
+
+export const fetchFilesByGoodsNo = async (goodsNo) => {
+    const response = await axios.get(`${API_URL}/files`, {
+        params: {
+            goodsNo,
+        },
+    });
+    return response.data;
 };

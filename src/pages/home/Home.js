@@ -28,7 +28,7 @@ function Home() {
                     <CircularProgress />
                     : ( error
                         ?
-                            <Typography>Error fetching goods</Typography>
+                            <Typography> 게시물을 불러오지못하였습니다. </Typography>
                         :
                             data.goods.map((good) => (
                                 <Grid item key={good.GOODS_NO} xs={12} sm={6} md={4}>
