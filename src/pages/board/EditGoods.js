@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { TextField, Button, Container, Typography, Input } from '@mui/material';
+import { TextField, Button, Container, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 function EditGoods() {
     const { id } = useParams();
@@ -16,14 +16,26 @@ function EditGoods() {
         GOODS_DATE: '',
         GOODS_KEYWORD: '',
         GOODS_THUMBNAIL: '',
-        FILE_NO: ''
     });
-    const [goodsImg, setGoodsImg] = useState(null);
+    const [goodsFiles, setGoodsFiles] = useState([]);
     const [error, setError] = useState('');
 
     useEffect(() => {
         axios.get(`http://localhost:5000/api/goods/${id}`)
-            .then(response => setGoods(response.data))
+            .then(response => {
+                const data = response.data;
+                setGoods({
+                    GOODS_CATEGORY: data.GOODS_CATEGORY || '',
+                    GOODS_NAME: data.GOODS_NAME || '',
+                    GOODS_CONTENT: data.GOODS_CONTENT || '',
+                    GOODS_ORIGIN_PRICE: data.GOODS_ORIGIN_PRICE || '',
+                    GOODS_SELL_PRICE: data.GOODS_SELL_PRICE || '',
+                    GOODS_SALE_PRICE: data.GOODS_SALE_PRICE || '',
+                    GOODS_DATE: data.GOODS_DATE ? data.GOODS_DATE.split('T')[0] : '',
+                    GOODS_KEYWORD: data.GOODS_KEYWORD || '',
+                    GOODS_THUMBNAIL: data.GOODS_THUMBNAIL || '',
+                });
+            })
             .catch(error => setError(error.message));
     }, [id]);
 
@@ -36,7 +48,7 @@ function EditGoods() {
     };
 
     const handleFileChange = (event) => {
-        setGoodsImg(event.target.files[0]);
+        setGoodsFiles(Array.from(event.target.files));
     };
 
     const handleSubmit = async (event) => {
@@ -45,9 +57,9 @@ function EditGoods() {
         Object.keys(goods).forEach(key => {
             formData.append(key, goods[key]);
         });
-        if (goodsImg) {
-            formData.append('file', goodsImg); // Update the key to 'file' to match the backend
-        }
+        goodsFiles.forEach(file => {
+            formData.append('files', file);
+        });
 
         try {
             await axios.put(`http://localhost:5000/api/goods/${id}`, formData, {
@@ -66,14 +78,19 @@ function EditGoods() {
             </Typography>
             {error && <Typography color="error">{error}</Typography>}
             <form onSubmit={handleSubmit}>
-                <TextField
-                    label="Category"
-                    name="GOODS_CATEGORY"
-                    value={goods.GOODS_CATEGORY}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                />
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                        label="Category"
+                        name="GOODS_CATEGORY"
+                        value={goods.GOODS_CATEGORY}
+                        onChange={handleChange}
+                    >
+                        <MenuItem value="A">A</MenuItem>
+                        <MenuItem value="B">B</MenuItem>
+                        <MenuItem value="C">C</MenuItem>
+                    </Select>
+                </FormControl>
                 <TextField
                     label="Name"
                     name="GOODS_NAME"
@@ -97,6 +114,7 @@ function EditGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="number"
                 />
                 <TextField
                     label="Sell Price"
@@ -105,6 +123,7 @@ function EditGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="number"
                 />
                 <TextField
                     label="Sale Price"
@@ -113,6 +132,7 @@ function EditGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="number"
                 />
                 <TextField
                     label="Date"
@@ -121,6 +141,10 @@ function EditGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="date"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
                 />
                 <TextField
                     label="Keyword"
@@ -138,12 +162,13 @@ function EditGoods() {
                     fullWidth
                     margin="normal"
                 />
-                <Input
+                <TextField
                     type="file"
-                    name="file"
+                    name="files"
                     onChange={handleFileChange}
                     fullWidth
                     margin="normal"
+                    inputProps={{ multiple: true }}
                 />
                 <Button type="submit" variant="contained" color="primary">
                     Save Changes

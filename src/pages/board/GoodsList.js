@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { Container, Grid, Card, CardContent, CardMedia, Typography, Button, CircularProgress, Box, Pagination } from '@mui/material';
 import { useQuery } from 'react-query';
 import { Link as RouterLink } from 'react-router-dom';
@@ -14,20 +14,8 @@ function GoodsList() {
     const { user } = useContext(AuthContext);
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
-    const [fileCounts, setFileCounts] = useState({});
 
     const { data, error, isLoading } = useQuery(['goods', page, limit], () => fetchGoodsWithPagination(page, limit), { keepPreviousData: true });
-
-    useEffect(() => {
-        if (data && data.goods) {
-            data.goods.forEach(async (good) => {
-                if (good.FILE_NO) {
-                    const countData = await fetchFileCount(good.FILE_NO);
-                    setFileCounts(prev => ({ ...prev, [good.FILE_NO]: countData.count }));
-                }
-            });
-        }
-    }, [data]);
 
     if (isLoading) {
         return <CircularProgress />;
@@ -70,7 +58,7 @@ function GoodsList() {
                                     {good.GOODS_CONTENT}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Attached Files: {fileCounts[good.FILE_NO] || 0}
+                                    Files: <FileCount goodsNo={good.GOODS_NO} />
                                 </Typography>
                             </CardContent>
                             <Button size="small" component={RouterLink} to={`/goods/${good.GOODS_NO}`}>
@@ -90,5 +78,14 @@ function GoodsList() {
         </Container>
     );
 }
+
+const FileCount = ({ goodsNo }) => {
+    const { data, error, isLoading } = useQuery(['fileCount', goodsNo], () => fetchFileCount(goodsNo));
+
+    if (isLoading) return <CircularProgress size={20} />;
+    if (error) return <Typography>Error fetching file count</Typography>;
+
+    return <span>{data.count}</span>;
+};
 
 export default GoodsList;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { TextField, Button, Container, Typography, Input } from '@mui/material';
+import { TextField, Button, Container, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 function AddGoods() {
     const navigate = useNavigate();
@@ -16,7 +16,7 @@ function AddGoods() {
         GOODS_KEYWORD: '',
         GOODS_THUMBNAIL: '',
     });
-    const [goodsImg, setGoodsImg] = useState(null);
+    const [goodsFiles, setGoodsFiles] = useState([]);
     const [error, setError] = useState('');
 
     const handleChange = (event) => {
@@ -28,7 +28,7 @@ function AddGoods() {
     };
 
     const handleFileChange = (event) => {
-        setGoodsImg(event.target.files[0]);
+        setGoodsFiles(Array.from(event.target.files));
     };
 
     const handleSubmit = async (event) => {
@@ -37,9 +37,9 @@ function AddGoods() {
         Object.keys(goods).forEach(key => {
             formData.append(key, goods[key]);
         });
-        if (goodsImg) {
-            formData.append('FILE_NO', goodsImg);
-        }
+        goodsFiles.forEach(file => {
+            formData.append('files', file);
+        });
 
         try {
             await axios.post('http://localhost:5000/api/goods', formData, {
@@ -58,13 +58,19 @@ function AddGoods() {
             </Typography>
             {error && <Typography color="error">{error}</Typography>}
             <form onSubmit={handleSubmit}>
-                <TextField label="Category"
-                           name="GOODS_CATEGORY"
-                           value={goods.GOODS_CATEGORY}
-                           onChange={handleChange}
-                           fullWidth
-                           margin="normal"
-                />
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                        label="Category"
+                        name="GOODS_CATEGORY"
+                        value={goods.GOODS_CATEGORY}
+                        onChange={handleChange}
+                    >
+                        <MenuItem value="A">A</MenuItem>
+                        <MenuItem value="B">B</MenuItem>
+                        <MenuItem value="C">C</MenuItem>
+                    </Select>
+                </FormControl>
                 <TextField
                     label="Name"
                     name="GOODS_NAME"
@@ -88,6 +94,7 @@ function AddGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="number"
                 />
                 <TextField
                     label="Sell Price"
@@ -96,6 +103,7 @@ function AddGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="number"
                 />
                 <TextField
                     label="Sale Price"
@@ -104,6 +112,7 @@ function AddGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="number"
                 />
                 <TextField
                     label="Date"
@@ -112,6 +121,10 @@ function AddGoods() {
                     onChange={handleChange}
                     fullWidth
                     margin="normal"
+                    type="date"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
                 />
                 <TextField
                     label="Keyword"
@@ -129,12 +142,13 @@ function AddGoods() {
                     fullWidth
                     margin="normal"
                 />
-                <Input
+                <TextField
                     type="file"
-                    name="FILE_NO"
+                    name="files"
                     onChange={handleFileChange}
                     fullWidth
                     margin="normal"
+                    inputProps={{ multiple: true }}
                 />
                 <Button type="submit" variant="contained" color="primary">
                     Add Goods

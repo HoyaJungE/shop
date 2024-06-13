@@ -8,12 +8,12 @@ import AuthContext from '../../context/AuthContext';
 function GoodDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { data: goodData, error: goodError, isLoading: goodLoading } = useQuery(['good', id], () => fetchGoodById(id));
+    const { data, error, isLoading } = useQuery(['good', id], () => fetchGoodById(id));
     const { data: filesData, error: filesError, isLoading: filesLoading } = useQuery(['files', id], () => fetchFilesByGoodsNo(id));
     const { user } = useContext(AuthContext);
 
-    if (goodLoading || filesLoading) return <CircularProgress />;
-    if (goodError) return <Typography>Error fetching good details</Typography>;
+    if (isLoading || filesLoading) return <CircularProgress />;
+    if (error) return <Typography>Error fetching good details</Typography>;
     if (filesError) return <Typography>Error fetching files</Typography>;
 
     const handleEditClick = () => {
@@ -24,59 +24,31 @@ function GoodDetail() {
         navigate('/goods');
     };
 
+    const handleDownload = (fileNo, fileSn) => {
+        window.location.href = `http://localhost:5000/api/file/download/${fileNo}/${fileSn}`;
+    };
+
     return (
         <Container maxWidth="md">
             <Box mt={4}>
                 <Card>
                     <CardMedia
                         component="img"
-                        alt={goodData.GOODS_NAME}
+                        alt={data.GOODS_NAME}
                         height="400"
-                        image={goodData.GOODS_THUMBNAIL}
-                        title={goodData.GOODS_NAME}
+                        image={data.GOODS_THUMBNAIL}
+                        title={data.GOODS_NAME}
                     />
                     <CardContent>
                         <Typography variant="h4" component="h2" gutterBottom>
-                            {goodData.GOODS_NAME}
+                            {data.GOODS_NAME}
                         </Typography>
                         <Typography variant="h6" component="h4" gutterBottom>
-                            {goodData.GOODS_CATEGORY}
+                            {data.GOODS_CATEGORY}
                         </Typography>
                         <Typography variant="body1" gutterBottom>
-                            {goodData.GOODS_CONTENT}
+                            {data.GOODS_CONTENT}
                         </Typography>
-                        <Typography variant="h5" component="h3" color="textSecondary" gutterBottom>
-                            Original Price: ${goodData.GOODS_ORIGIN_PRICE}
-                        </Typography>
-                        <Typography variant="h5" component="h3" color="textSecondary" gutterBottom>
-                            Sell Price: ${goodData.GOODS_SELL_PRICE}
-                        </Typography>
-                        {goodData.GOODS_SALE_PRICE && (
-                            <Typography variant="h5" component="h3" color="textSecondary" gutterBottom>
-                                Sale Price: ${goodData.GOODS_SALE_PRICE}
-                            </Typography>
-                        )}
-                        {filesData.length > 0 && (
-                            <Box mt={4}>
-                                <Typography variant="h6" component="h4" gutterBottom>
-                                    Attached Files:
-                                </Typography>
-                                <List>
-                                    {filesData.map((file) => (
-                                        <ListItem key={file.FILE_NO}>
-                                            <ListItemText
-                                                primary={file.FILE_NAME}
-                                                secondary={
-                                                    <Button href={`/uploads/${file.FILE_NAME}`} target="_blank" rel="noopener noreferrer">
-                                                        Download
-                                                    </Button>
-                                                }
-                                            />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Box>
-                        )}
                         <Box mt={2}>
                             {user && (
                                 <Button variant="contained" color="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>
@@ -87,6 +59,27 @@ function GoodDetail() {
                                 Back to Goods List
                             </Button>
                         </Box>
+                        {filesData && filesData.length > 0 && (
+                            <Box mt={4}>
+                                <Typography variant="h6" component="h4" gutterBottom>
+                                    Attached Files
+                                </Typography>
+                                <List>
+                                    {filesData.map(file => (
+                                        <ListItem key={file.FILE_NO + '-' + file.FILE_SN}>
+                                            <ListItemText primary={file.FILE_LOGIC_NM} />
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() => handleDownload(file.FILE_NO, file.FILE_SN)}
+                                            >
+                                                Download
+                                            </Button>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Box>
+                        )}
                     </CardContent>
                 </Card>
             </Box>

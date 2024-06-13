@@ -61,6 +61,20 @@ export const deleteMenu = async (id) => {
     return response.data;
 };
 
+export const fetchFilesByGoodsNo = async (goodsNo) => {
+    const response = await axios.get(`${API_URL}/file/goods/${goodsNo}`); // 경로 수정
+    return response.data;
+};
+
+export const fetchFileCount = async (goodsNo) => {
+    const response = await axios.get(`${API_URL}/file/count`, {
+        params: {
+            goodsNo,
+        },
+    });
+    return response.data;
+};
+
 export const buildMenuTree = (menus) => {
     const map = new Map();
     const roots = [];
@@ -78,22 +92,4 @@ export const buildMenuTree = (menus) => {
     });
 
     return roots;
-};
-
-export const fetchFileCount = async (fileNo) => {
-    const response = await axios.get(`${API_URL}/files/count`, {
-        params: {
-            fileNo,
-        },
-    });
-    return response.data;
-};
-
-export const fetchFilesByGoodsNo = async (goodsNo) => {
-    const response = await axios.get(`${API_URL}/files`, {
-        params: {
-            goodsNo,
-        },
-    });
-    return response.data;
 };
