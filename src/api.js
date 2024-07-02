@@ -93,3 +93,23 @@ export const buildMenuTree = (menus) => {
 
     return roots;
 };
+
+export const fetchRoles = async () => {
+    const response = await axios.get(`${API_URL}/role`);
+    return response.data;
+};
+
+export const addRole = async (role) => {
+    const response = await axios.post(`${API_URL}/role`, role);
+    return response.data;
+};
+
+export const updateRole = async (role) => {
+    const response = await axios.put(`${API_URL}/role/${role.ROLE_NO}`, role);
+    return response.data;
+};
+
+export const deleteRole = async (id) => {
+    const response = await axios.delete(`${API_URL}/role/${id}`);
+    return response.data;
+};

@@ -15,6 +15,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import AddMenu from "./pages/menu/AddMenu";
+import AddRole from "./pages/role/AddRole";
+import RoleList from "./pages/role/RoleList";
 
 function App() {
     return (
@@ -33,6 +35,8 @@ function App() {
                     <Route path="add-menu" element={<AddMenu />} />
                     <Route path="menu/:id" element={<MenuDetail />} />
                     <Route path="edit-menu/:id" element={<EditMenu />} /> {/* Update route */}
+                    <Route path="add-role" element={<AddRole />} />
+                    <Route path="roles" element={<RoleList />} />
                 </Routes>
                 <Footer />
             </Router>

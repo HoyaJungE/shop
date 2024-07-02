@@ -33,7 +33,6 @@ const Header = () => {
         const loadMenus = async () => {
             try {
                 const data = await fetchMenus();
-                console.log('Fetched menus:', data);
                 const menuTree = buildMenuTree(data);
                 setMenus(menuTree);
             } catch (error) {
