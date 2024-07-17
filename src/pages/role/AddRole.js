@@ -30,7 +30,7 @@ const AddRole = () => {
 
     const validate = () => {
         let tempErrors = {};
-        tempErrors.ROLE_NAME = RoleData.ROLE_NAME ? '' : 'Role name is required.';
+        tempErrors.ROLE_NM = RoleData.ROLE_NM ? '' : 'Role name is required.';
         setErrors(tempErrors);
         return Object.values(tempErrors).every(x => x === '');
     };
@@ -64,19 +64,19 @@ const AddRole = () => {
                     </MenuItem>
                     {Roles.map(Role => (
                         <MenuItem key={Role.ROLE_NO} value={Role.ROLE_NO}>
-                            {Role.ROLE_NAME}
+                            {Role.ROLE_NM}
                         </MenuItem>
                     ))}
                 </TextField>
                 <TextField
                     fullWidth
                     label="Role Name"
-                    name="ROLE_NAME"
-                    value={RoleData.ROLE_NAME}
+                    name="ROLE_NM"
+                    value={RoleData.ROLE_NM}
                     onChange={handleChange}
                     margin="normal"
-                    error={!!errors.ROLE_NAME}
-                    helperText={errors.ROLE_NAME}
+                    error={!!errors.ROLE_NM}
+                    helperText={errors.ROLE_NM}
                 />
                 <TextField
                     fullWidth

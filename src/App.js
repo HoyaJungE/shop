@@ -17,6 +17,7 @@ import { AuthProvider } from './context/AuthContext';
 import AddMenu from "./pages/menu/AddMenu";
 import AddRole from "./pages/role/AddRole";
 import RoleList from "./pages/role/RoleList";
+import RoleDetail from "./pages/role/RoleDetail";
 
 function App() {
     return (
@@ -34,9 +35,11 @@ function App() {
                     <Route path="menus" element={<MenuList />} />
                     <Route path="add-menu" element={<AddMenu />} />
                     <Route path="menu/:id" element={<MenuDetail />} />
-                    <Route path="edit-menu/:id" element={<EditMenu />} /> {/* Update route */}
+                    <Route path="edit-menu/:id" element={<EditMenu />} />
                     <Route path="add-role" element={<AddRole />} />
                     <Route path="roles" element={<RoleList />} />
+                    <Route path="role/:id" element={<RoleDetail />} />
+                    <Route path="edit-role/:id" element={<EditMenu />} />
                 </Routes>
                 <Footer />
             </Router>

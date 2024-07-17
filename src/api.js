@@ -99,6 +99,11 @@ export const fetchRoles = async () => {
     return response.data;
 };
 
+export const fetchRoleById = async (id) => {
+    const response = await axios.get(`${API_URL}/role/${id}`);
+    return response.data;
+};
+
 export const addRole = async (role) => {
     const response = await axios.post(`${API_URL}/role`, role);
     return response.data;

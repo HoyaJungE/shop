@@ -44,7 +44,7 @@ const RoleDetail = () => {
                         variant="contained"
                         color="primary"
                         component={RouterLink}
-                        to={`/edit-Role/${Role.ROLE_NO}`}
+                        to={`/edit-role/${Role.ROLE_NO}`}
                     >
                         Edit Role
                     </Button>
