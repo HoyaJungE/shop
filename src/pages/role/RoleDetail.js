@@ -6,7 +6,7 @@ import { Container, Typography, CircularProgress, Box, Button } from '@mui/mater
 
 const RoleDetail = () => {
     const { id } = useParams();
-    const [Role, setRole] = useState(null);
+    const [role, setRole] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,7 +27,7 @@ const RoleDetail = () => {
         return <CircularProgress />;
     }
 
-    if (!Role) {
+    if (!role) {
         return <Typography>No Role found</Typography>;
     }
 
@@ -37,14 +37,14 @@ const RoleDetail = () => {
                 Role Detail
             </Typography>
             <Box>
-                <Typography variant="h6">Name: {Role.ROLE_NM}</Typography>
+                <Typography variant="h6">Name: {role.ROLE_NM}</Typography>
                 {/* 다른 필요한 메뉴 정보 추가 */}
                 <Box mt={2}>
                     <Button
                         variant="contained"
                         color="primary"
                         component={RouterLink}
-                        to={`/edit-role/${Role.ROLE_NO}`}
+                        to={`/edit-role/${role.ROLE_NO}`}
                     >
                         Edit Role
                     </Button>

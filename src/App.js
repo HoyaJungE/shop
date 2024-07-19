@@ -10,7 +10,7 @@ import EditGoods from './pages/board/EditGoods';
 import GoodDetail from './pages/board/GoodDetail';
 import MenuList from './pages/menu/MenuList';
 import MenuDetail from './pages/menu/MenuDetail';
-import EditMenu from './pages/menu/EditMenu'; // Update import
+import EditMenu from './pages/menu/EditMenu';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
@@ -18,6 +18,7 @@ import AddMenu from "./pages/menu/AddMenu";
 import AddRole from "./pages/role/AddRole";
 import RoleList from "./pages/role/RoleList";
 import RoleDetail from "./pages/role/RoleDetail";
+import EditRole from "./pages/role/EditRole";
 
 function App() {
     return (
@@ -39,7 +40,7 @@ function App() {
                     <Route path="add-role" element={<AddRole />} />
                     <Route path="roles" element={<RoleList />} />
                     <Route path="role/:id" element={<RoleDetail />} />
-                    <Route path="edit-role/:id" element={<EditMenu />} />
+                    <Route path="edit-role/:id" element={<EditRole />} />
                 </Routes>
                 <Footer />
             </Router>

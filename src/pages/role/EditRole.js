@@ -1,49 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchMenuById, updateMenu } from '../../api';
+import {fetchRoleById, updateRole} from '../../api';
 import {
     Container, TextField, Button, Box, Typography, CircularProgress, Alert
 } from '@mui/material';
 
-const EditMenu = () => {
+const EditRole = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [menu, setMenu] = useState({
-        UPPR_MENU_NO: '',
-        MENU_URL: '',
-        MENU_NAME: '',
-        ORDR: '',
-        MENU_TYPE: '',
+    const [roleData, setRoleData] = useState({
+        ROLE_NO:0,
+        UPPR_ROLE_NO:null,
+        ROLE_NM:'',
+        ROLE_CN:''
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        const loadMenu = async () => {
+        const loadRole = async () => {
             try {
-                const data = await fetchMenuById(id);
-                console.log(data);
-                setMenu(data);
+                const data = await fetchRoleById(id);
+                setRoleData(data);
                 setLoading(false);
             } catch (error) {
-                setError('Failed to fetch menu data');
+                setError('Failed to fetch role data');
                 setLoading(false);
             }
         };
-        loadMenu();
+        loadRole();
     }, [id]);
 
     const handleChange = (e) => {
-        setMenu({ ...menu, [e.target.name]: e.target.value });
+        setRoleData({ ...roleData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await updateMenu(menu);
-            navigate('/menus');
+            await updateRole(roleData);
+            navigate('/roles');
         } catch (error) {
-            setError('Failed to update menu');
+            setError('Failed to update role');
         }
     };
 
@@ -65,56 +63,52 @@ const EditMenu = () => {
 
     return (
         <Container>
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4 }}>
                 <Typography variant="h6" gutterBottom>
-                    Edit Menu
+                    Edit Role
                 </Typography>
                 <TextField
-                    label="Upper Menu No"
-                    name="UPPR_MENU_NO"
-                    value={menu.UPPR_MENU_NO}
-                    onChange={handleChange}
+                    select
                     fullWidth
+                    label="Role No"
+                    name="ROLE_NO"
+                    value={roleData.ROLE_NO}
+                    onChange={handleChange}
                     margin="normal"
                 />
                 <TextField
-                    label="Menu URL"
-                    name="MENU_URL"
-                    value={menu.MENU_URL}
-                    onChange={handleChange}
+                    select
                     fullWidth
+                    label="Upper Role"
+                    name="UPPR_ROLE_NO"
+                    value={roleData.UPPR_ROLE_NO}
+                    onChange={handleChange}
                     margin="normal"
                 />
                 <TextField
-                    label="Menu Name"
-                    name="MENU_NAME"
-                    value={menu.MENU_NAME}
-                    onChange={handleChange}
                     fullWidth
+                    label="Role Name"
+                    name="ROLE_NM"
+                    value={roleData.ROLE_NM}
+                    onChange={handleChange}
                     margin="normal"
+                    error={!!error.ROLE_NM}
+                    helperText={error.ROLE_NM}
                 />
                 <TextField
-                    label="Order"
-                    name="ORDR"
-                    value={menu.ORDR}
-                    onChange={handleChange}
                     fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Menu Type"
-                    name="MENU_TYPE"
-                    value={menu.MENU_TYPE}
+                    label="Role Description"
+                    name="ROLE_CN"
+                    value={roleData.ROLE_CN}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                 />
                 <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Update Menu
+                    Update Role
                 </Button>
             </Box>
         </Container>
     );
 };
 
-export default EditMenu;
+export default EditRole;
