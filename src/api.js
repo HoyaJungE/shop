@@ -118,3 +118,18 @@ export const deleteRole = async (id) => {
     const response = await axios.delete(`${API_URL}/role/${id}`);
     return response.data;
 };
+
+export const fetchMembers = async (page = 1, limit = 10) => {
+    const response = await axios.get(`${API_URL}/member`, {
+        params: {
+            page,
+            limit,
+        },
+    });
+    return response.data;
+};
+
+export const addMemberRole = async (memberrole) => {
+    const response = await axios.post(`${API_URL}/memberrole`, memberrole);
+    return response.data;
+};

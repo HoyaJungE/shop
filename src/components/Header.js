@@ -91,6 +91,11 @@ const Header = () => {
                             Shopping
                         </Link>
                     </Typography>
+                    <>
+                        <Button color="inherit" component={RouterLink} to="/ManageMemberRole">
+                            ManageMemberRole
+                        </Button>
+                    </>
                     {menus.length > 0 && (
                         <Box>
                             {menus.map(menu => (

@@ -37,6 +37,8 @@ const RoleDetail = () => {
                 Role Detail
             </Typography>
             <Box>
+                <Typography variant="h6">upperRoleNo: {role.UPPR_ROLE_NO}</Typography>
+                <Typography variant="h6">roleNo: {role.ROLE_NO}</Typography>
                 <Typography variant="h6">Name: {role.ROLE_NM}</Typography>
                 {/* 다른 필요한 메뉴 정보 추가 */}
                 <Box mt={2}>

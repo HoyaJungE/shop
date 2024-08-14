@@ -1,6 +1,6 @@
 // src/components/styles.js
 import { styled } from '@mui/system';
-import { Box } from '@mui/material';
+import {Box, Dialog, DialogTitle} from '@mui/material';
 
 export const Banner = styled(Box)(({ theme }) => ({
     height: '300px',
@@ -24,4 +24,19 @@ export const Footer = styled(Box)(({ theme }) => ({
     position: 'relative',
     left: 0,
     right: 0,
+}));
+
+export const StyledDialog = styled(Dialog)(({ theme }) => ({
+    '& .MuiPaper-root': {
+        borderRadius: '10px',
+        padding: theme.spacing(2),
+    },
+}));
+
+export const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+    margin: 0,
+    padding: theme.spacing(2),
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
 }));
