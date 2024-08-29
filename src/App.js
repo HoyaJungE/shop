@@ -42,7 +42,7 @@ function App() {
                     <Route path="roles" element={<RoleList />} />
                     <Route path="role/:id" element={<RoleDetail />} />
                     <Route path="edit-role/:id" element={<EditRole />} />
-                    <Route path="manageMemberRole" element={<ManageMemberRole />} />
+                    <Route path="/manageMemberRole" element={<ManageMemberRole />} />
                 </Routes>
                 <Footer />
             </Router>

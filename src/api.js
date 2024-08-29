@@ -129,7 +129,17 @@ export const fetchMembers = async (page = 1, limit = 10) => {
     return response.data;
 };
 
-export const addMemberRole = async (memberrole) => {
-    const response = await axios.post(`${API_URL}/memberrole`, memberrole);
+export const addMemberRole = async (memberRole) => {
+    const response = await axios.post(`${API_URL}/memberRole`, memberRole);
+    return response.data;
+};
+
+export const fetchRoleMembers = async (roleNo) => {
+    console.log(roleNo);
+    const response = await axios.get(`${API_URL}/role/roleMembers`, {
+        params: {
+            roleNo: roleNo,
+        },
+    });
     return response.data;
 };

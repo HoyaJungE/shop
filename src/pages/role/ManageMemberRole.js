@@ -1,7 +1,7 @@
 // src/pages/Role/ManageMemberRole.js
 import React, { useState, useEffect } from 'react';
 import {Link as RouterLink, useNavigate} from 'react-router-dom';
-import {fetchRoles, addRole, fetchMembers, updateMenu, addMemberRole} from '../../api';
+import {fetchRoles, addRole, fetchMembers, addMemberRole, fetchRoleMembers} from '../../api';
 import {
     Container,
     TextField,
@@ -55,6 +55,7 @@ const ManageMemberRole = () => {
 
     const [Roles, setRoles] = useState([]);
     const [members, setMembers] = useState([]);
+    const [roleMembers, setRoleMembers] = useState([]);
     const [error, setError] = useState({});
     const navigate = useNavigate();
     const loadRoles = async () => {
@@ -65,6 +66,12 @@ const ManageMemberRole = () => {
     const loadMembers = async () => {
         const data = await fetchMembers();
         setMembers(data);
+    };
+
+    const loadRoleMembers = async () => {
+        const data = await fetchRoleMembers(1);
+        console.log(data);
+        setRoleMembers(data);
     };
 
     useEffect(() => {
@@ -97,38 +104,21 @@ const ManageMemberRole = () => {
         }
     };
 
-    const [open, setOpen] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
 
-    const handleOpen = () => {
-        setOpen(true);
+    const handleModalOpen = () => {
+        setModalOpen(true);
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleModaClose = () => {
+        setModalOpen(false);
     };
 
     return (
         <Container>
-            <Button variant="contained" color="primary" onClick={handleOpen}>
+            <Button variant="contained" color="primary" onClick={loadRoleMembers}>
                 Open Modal
             </Button>
-            <CustomModal open={open} onClose={handleClose} title="Modal Title">
-                <p>This is the modal content.</p>
-                <Grid container spacing={4}>
-                    {Roles.map(Role => (
-                        <ListItem
-                            key={Role.ROLE_NO}
-                            button
-                            component={RouterLink}
-                        >
-                            <ListItemText
-                                primary={Role.ROLE_NO}
-                                secondary={Role.ROLE_NM}
-                            />
-                        </ListItem>
-                    ))}
-                </Grid>
-            </CustomModal>
 
             <Typography variant="h4" gutterBottom>
                 ManageMemberRole
@@ -140,17 +130,39 @@ const ManageMemberRole = () => {
                 </Typography>
                 <Grid container spacing={4}>
                     {Roles.map(Role => (
-                        <ListItem
-                            key={Role.ROLE_NO}
-                            button
-                            component={RouterLink}
-                            onClick={()=>{ memberRole.ROLE_NO = Role.ROLE_NO; console.log(memberRole); }}
-                        >
-                            <ListItemText
-                                primary={Role.ROLE_NO}
-                                secondary={Role.ROLE_NM}
-                            />
-                        </ListItem>
+                        <>
+                            <ListItem
+                                key={Role.ROLE_NO}
+                                button
+                                component={RouterLink}
+                                onClick={()=>{ memberRole.ROLE_NO = Role.ROLE_NO; console.log(memberRole); }}
+                            >
+                                <ListItemText
+                                    primary={Role.ROLE_NO}
+                                    secondary={Role.ROLE_NM}
+                                />
+                            </ListItem>
+                            <Button variant="contained" color="primary" onClick={handleModalOpen}>
+                            Open Modal
+                            </Button>
+                            <CustomModal open={modalOpen} onClose={handleModaClose} title="Modal Title">
+                                <p>This is the modal content.</p>
+                                <Grid container spacing={4}>
+                                    {Roles.map(Role => (
+                                        <ListItem
+                                        key={Role.ROLE_NO}
+                                        button
+                                        component={RouterLink}
+                                        >
+                                        <ListItemText
+                                        primary={Role.ROLE_NO}
+                                        secondary={Role.ROLE_NM}
+                                        />
+                                        </ListItem>
+                                    ))}
+                                </Grid>
+                            </CustomModal>
+                        </>
                     ))}
                 </Grid>
 
