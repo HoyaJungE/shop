@@ -56,6 +56,7 @@ const ManageMemberRole = () => {
     const [Roles, setRoles] = useState([]);
     const [members, setMembers] = useState([]);
     const [roleMembers, setRoleMembers] = useState([]);
+    const [modalContents, setModalContents] = useState({});
     const [error, setError] = useState({});
     const navigate = useNavigate();
     const loadRoles = async () => {
@@ -69,9 +70,25 @@ const ManageMemberRole = () => {
     };
 
     const loadRoleMembers = async () => {
-        const data = await fetchRoleMembers(1);
-        console.log(data);
+        const data = await fetchRoleMembers();
         setRoleMembers(data);
+
+        setModalContents(
+            <Grid container spacing={4}>
+                {roleMembers.map(rm => (
+                    <ListItem
+                        key={rm.ROLE_NO}
+                        button
+                        component={RouterLink}
+                    >
+                        <ListItemText
+                            primary={rm.ROLE_NO}
+                            secondary={rm.MEMBER_ID}
+                        />
+                    </ListItem>
+                ))}
+            </Grid>
+        );
     };
 
     useEffect(() => {
@@ -117,12 +134,18 @@ const ManageMemberRole = () => {
     return (
         <Container>
             <Button variant="contained" color="primary" onClick={loadRoleMembers}>
-                Open Modal
+                road rmData
             </Button>
 
             <Typography variant="h4" gutterBottom>
                 ManageMemberRole
             </Typography>
+
+            <Button variant="contained" color="primary" onClick={handleModalOpen}>
+                Open Modal
+            </Button>
+                <CustomModal open={modalOpen} onClose={handleModaClose} title="Modal Title" children={modalContents}>
+            </CustomModal>
 
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                 <Typography variant="h4" gutterBottom>
@@ -142,26 +165,6 @@ const ManageMemberRole = () => {
                                     secondary={Role.ROLE_NM}
                                 />
                             </ListItem>
-                            <Button variant="contained" color="primary" onClick={handleModalOpen}>
-                            Open Modal
-                            </Button>
-                            <CustomModal open={modalOpen} onClose={handleModaClose} title="Modal Title">
-                                <p>This is the modal content.</p>
-                                <Grid container spacing={4}>
-                                    {Roles.map(Role => (
-                                        <ListItem
-                                        key={Role.ROLE_NO}
-                                        button
-                                        component={RouterLink}
-                                        >
-                                        <ListItemText
-                                        primary={Role.ROLE_NO}
-                                        secondary={Role.ROLE_NM}
-                                        />
-                                        </ListItem>
-                                    ))}
-                                </Grid>
-                            </CustomModal>
                         </>
                     ))}
                 </Grid>

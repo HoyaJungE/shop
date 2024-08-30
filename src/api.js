@@ -135,7 +135,6 @@ export const addMemberRole = async (memberRole) => {
 };
 
 export const fetchRoleMembers = async (roleNo) => {
-    console.log(roleNo);
     const response = await axios.get(`${API_URL}/role/roleMembers`, {
         params: {
             roleNo: roleNo,
