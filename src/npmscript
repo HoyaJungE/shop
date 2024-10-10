@@ -36,3 +36,6 @@ Material-UI 설치
 bash
 코드 복사
 npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
+
+mui 아이콘모음다운로드
+npm install @mui/icons-material
