@@ -46,7 +46,7 @@ function GoodDetail() {
                         <Typography variant="h6" component="h4" gutterBottom>
                             {data.GOODS_CATEGORY}
                         </Typography>
-                        <Typography variant="body1" gutterBottom>
+                        <Typography variant="body1" gutterBottom style={{ whiteSpace: 'pre-line'}}>
                             {data.GOODS_CONTENT}
                         </Typography>
                         <Box mt={2}>

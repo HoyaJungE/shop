@@ -1,6 +1,7 @@
 // src/components/styles.js
 import { styled } from '@mui/system';
-import {Box, Dialog, DialogTitle} from '@mui/material';
+import {Box, Dialog, DialogTitle, TextField} from '@mui/material';
+import {blue} from "@mui/material/colors";
 
 export const Banner = styled(Box)(({ theme }) => ({
     height: '300px',
@@ -39,4 +40,8 @@ export const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+}));
+
+export const StyledTextField = styled(TextField)(({ theme }) => ({
+    
 }));

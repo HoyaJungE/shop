@@ -59,9 +59,9 @@ function AddGoods() {
             {error && <Typography color="error">{error}</Typography>}
             <form onSubmit={handleSubmit}>
                 <FormControl fullWidth margin="normal">
-                    <InputLabel>Category</InputLabel>
+                    <InputLabel>분류</InputLabel>
                     <Select
-                        label="Category"
+                        label="분류"
                         name="GOODS_CATEGORY"
                         value={goods.GOODS_CATEGORY}
                         onChange={handleChange}
@@ -72,7 +72,7 @@ function AddGoods() {
                     </Select>
                 </FormControl>
                 <TextField
-                    label="Name"
+                    label="제목"
                     name="GOODS_NAME"
                     value={goods.GOODS_NAME}
                     onChange={handleChange}
@@ -80,46 +80,44 @@ function AddGoods() {
                     margin="normal"
                 />
                 <TextField
-                    label="Content"
+                    label="내용"
                     name="GOODS_CONTENT"
                     value={goods.GOODS_CONTENT}
                     onChange={handleChange}
                     fullWidth
+                    multiline
+                    rows={4}
                     margin="normal"
                 />
-                <TextField
-                    label="Origin Price"
+                {/*<TextField
+                    label="원가"
                     name="GOODS_ORIGIN_PRICE"
                     value={goods.GOODS_ORIGIN_PRICE}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                     type="number"
                 />
                 <TextField
-                    label="Sell Price"
+                    label="판매가"
                     name="GOODS_SELL_PRICE"
                     value={goods.GOODS_SELL_PRICE}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                     type="number"
                 />
                 <TextField
-                    label="Sale Price"
+                    label="할인가"
                     name="GOODS_SALE_PRICE"
                     value={goods.GOODS_SALE_PRICE}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                     type="number"
-                />
+                />*/}
                 <TextField
-                    label="Date"
+                    label="날짜"
                     name="GOODS_DATE"
                     value={goods.GOODS_DATE}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                     type="date"
                     InputLabelProps={{
@@ -127,22 +125,21 @@ function AddGoods() {
                     }}
                 />
                 <TextField
-                    label="Keyword"
+                    label="키워드"
                     name="GOODS_KEYWORD"
                     value={goods.GOODS_KEYWORD}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                 />
                 <TextField
-                    label="Thumbnail"
+                    label="썸네일"
                     name="GOODS_THUMBNAIL"
                     value={goods.GOODS_THUMBNAIL}
                     onChange={handleChange}
-                    fullWidth
                     margin="normal"
                 />
                 <TextField
+                    label="첨부파일"
                     type="file"
                     name="files"
                     onChange={handleFileChange}

@@ -54,7 +54,7 @@ function GoodsList() {
                                 <Typography variant="h5" component="div">
                                     {good.GOODS_NAME}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography variant="body2" color="text.secondary" style={{ whiteSpace: 'pre-line'}}>
                                     {good.GOODS_CONTENT}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
