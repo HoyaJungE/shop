@@ -152,3 +152,22 @@ export const deleteMemberRole = async (memberRole) => {
     const response = await axios.post(`${API_URL}/role/deleteMemberRole`, memberRole);
     return response.data;
 };
+
+export const fetchRoleMenus = async (roleNo) => {
+    const response = await axios.get(`${API_URL}/role/roleMenus`, {
+        params: {
+            roleNo: roleNo,
+        },
+    });
+    return response.data;
+};
+
+export const addRoleMenu = async (roleMenu) => {
+    const response = await axios.post(`${API_URL}/role/addRoleMenu`, roleMenu);
+    return response.data;
+};
+
+export const deleteRoleMenu = async (roleMenu) => {
+    const response = await axios.post(`${API_URL}/role/deleteRoleMenu`, roleMenu);
+    return response.data;
+};

@@ -20,6 +20,7 @@ import RoleList from "./pages/role/RoleList";
 import RoleDetail from "./pages/role/RoleDetail";
 import EditRole from "./pages/role/EditRole";
 import ManageMemberRole from "./pages/role/ManageMemberRole";
+import ManageRoleMenu from "./pages/role/ManageRoleMenu";
 
 function App() {
     return (
@@ -43,6 +44,7 @@ function App() {
                     <Route path="role/:id" element={<RoleDetail />} />
                     <Route path="edit-role/:id" element={<EditRole />} />
                     <Route path="/manageMemberRole" element={<ManageMemberRole />} />
+                    <Route path="/manageRoleMenu" element={<ManageRoleMenu />} />
                 </Routes>
                 <Footer />
             </Router>
