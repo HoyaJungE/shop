@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import editorConfig from "../../components/editorConfig";
+import {CKEditor} from "@ckeditor/ckeditor5-react";
+import {ClassicEditor} from "ckeditor5";
+import 'ckeditor5/ckeditor5.css';
 
 function AddGoods() {
     const navigate = useNavigate();
@@ -51,6 +55,7 @@ function AddGoods() {
         }
     };
 
+
     return (
         <Container>
             <Typography variant="h4" component="h1" gutterBottom>
@@ -79,7 +84,7 @@ function AddGoods() {
                     fullWidth
                     margin="normal"
                 />
-                <TextField
+                {/*<TextField
                     label="내용"
                     name="GOODS_CONTENT"
                     value={goods.GOODS_CONTENT}
@@ -88,6 +93,11 @@ function AddGoods() {
                     multiline
                     rows={4}
                     margin="normal"
+                />*/}
+                <CKEditor
+                    editor={ClassicEditor}
+                    config={editorConfig}
+                    data={goods.GOODS_CONTENT}
                 />
                 {/*<TextField
                     label="원가"
