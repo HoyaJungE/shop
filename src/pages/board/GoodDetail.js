@@ -4,6 +4,7 @@ import { useQuery } from 'react-query';
 import { Container, Typography, CircularProgress, Box, Card, CardContent, CardMedia, Button, List, ListItem, ListItemText } from '@mui/material';
 import { fetchGoodById, fetchFilesByGoodsNo } from '../../api';
 import AuthContext from '../../context/AuthContext';
+import 'ckeditor5/ckeditor5.css';
 
 function GoodDetail() {
     const { id } = useParams();
@@ -32,33 +33,15 @@ function GoodDetail() {
         <Container maxWidth="md">
             <Box mt={4}>
                 <Card>
-                    <CardMedia
-                        component="img"
-                        alt={data.GOODS_NAME}
-                        height="400"
-                        image={data.GOODS_THUMBNAIL}
-                        title={data.GOODS_NAME}
-                    />
                     <CardContent>
+                        <Typography variant="h7" component="h6" cx={{ color: 'rgb(105,105,105)' }} gutterBottom>
+                            {data.GOODS_CATEGORY}
+                        </Typography>
                         <Typography variant="h4" component="h2" gutterBottom>
                             {data.GOODS_NAME}
                         </Typography>
-                        <Typography variant="h6" component="h4" gutterBottom>
-                            {data.GOODS_CATEGORY}
-                        </Typography>
-                        <Typography variant="body1" gutterBottom style={{ whiteSpace: 'pre-line'}}>
-                            {data.GOODS_CONTENT}
-                        </Typography>
-                        <Box mt={2}>
-                            {user && (
-                                <Button variant="contained" color="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>
-                                    Edit
-                                </Button>
-                            )}
-                            <Button variant="outlined" color="secondary" onClick={handleBackClick}>
-                                Back to Goods List
-                            </Button>
-                        </Box>
+                        <Typography variant="body1" gutterBottom cx={{ whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{ __html: data.GOODS_CONTENT }}></Typography>
+
                         {filesData && filesData.length > 0 && (
                             <Box mt={4}>
                                 <Typography variant="h6" component="h4" gutterBottom>
@@ -80,6 +63,17 @@ function GoodDetail() {
                                 </List>
                             </Box>
                         )}
+
+                        <Box mt={2}>
+                            {user && (
+                                <Button variant="contained" color="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>
+                                    수정
+                                </Button>
+                            )}
+                            <Button variant="outlined" color="secondary" onClick={handleBackClick}>
+                                목록
+                            </Button>
+                        </Box>
                     </CardContent>
                 </Card>
             </Box>

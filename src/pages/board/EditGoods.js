@@ -3,6 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import {StyledTextField} from "../../components/styles";
+import editorConfig from "../../components/editorConfig";
+import {CKEditor} from "@ckeditor/ckeditor5-react";
+import {ClassicEditor} from "ckeditor5";
+import 'ckeditor5/ckeditor5.css';
+import styles from '../../css/board.module.css';
 
 function EditGoods() {
     const { id } = useParams();
@@ -100,40 +105,18 @@ function EditGoods() {
                     fullWidth
                     margin="normal"
                 />
-                <StyledTextField
+                <CKEditor
                     label="내용"
-                    name="GOODS_CONTENT"
-                    value={goods.GOODS_CONTENT}
-                    onChange={handleChange}
-                    fullWidth
-                    multiline
-                    rows={4}
-                    margin="normal"
+                    editor={ClassicEditor}
+                    config={editorConfig}
+                    data={goods.GOODS_CONTENT}
+                    onChange={(event, editor) => {
+                        setGoods(prevState => ({
+                            ...prevState,
+                            GOODS_CONTENT: editor.getData(),
+                        }));
+                    }}
                 />
-                {/*<TextField
-                    label="원가"
-                    name="GOODS_ORIGIN_PRICE"
-                    value={goods.GOODS_ORIGIN_PRICE}
-                    onChange={handleChange}
-                    margin="normal"
-                    type="number"
-                />
-                <TextField
-                    label="판매가"
-                    name="GOODS_SELL_PRICE"
-                    value={goods.GOODS_SELL_PRICE}
-                    onChange={handleChange}
-                    margin="normal"
-                    type="number"
-                />
-                <TextField
-                    label="할인가"
-                    name="GOODS_SALE_PRICE"
-                    value={goods.GOODS_SALE_PRICE}
-                    onChange={handleChange}
-                    margin="normal"
-                    type="number"
-                />*/}
                 <TextField
                     label="날짜"
                     name="GOODS_DATE"
@@ -169,7 +152,7 @@ function EditGoods() {
                     inputProps={{ multiple: true }}
                 />
                 <Button type="submit" variant="contained" color="primary">
-                    Save Changes
+                    수정
                 </Button>
             </form>
         </Container>

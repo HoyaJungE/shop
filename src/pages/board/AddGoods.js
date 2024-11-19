@@ -6,6 +6,7 @@ import editorConfig from "../../components/editorConfig";
 import {CKEditor} from "@ckeditor/ckeditor5-react";
 import {ClassicEditor} from "ckeditor5";
 import 'ckeditor5/ckeditor5.css';
+import styles from '../../css/board.module.css';
 
 function AddGoods() {
     const navigate = useNavigate();
@@ -84,45 +85,18 @@ function AddGoods() {
                     fullWidth
                     margin="normal"
                 />
-                {/*<TextField
-                    label="내용"
-                    name="GOODS_CONTENT"
-                    value={goods.GOODS_CONTENT}
-                    onChange={handleChange}
-                    fullWidth
-                    multiline
-                    rows={4}
-                    margin="normal"
-                />*/}
                 <CKEditor
+                    label="내용"
                     editor={ClassicEditor}
                     config={editorConfig}
                     data={goods.GOODS_CONTENT}
+                    onChange={(event, editor) => {
+                        setGoods(prevState => ({
+                            ...prevState,
+                            GOODS_CONTENT: editor.getData(),
+                        }));
+                    }}
                 />
-                {/*<TextField
-                    label="원가"
-                    name="GOODS_ORIGIN_PRICE"
-                    value={goods.GOODS_ORIGIN_PRICE}
-                    onChange={handleChange}
-                    margin="normal"
-                    type="number"
-                />
-                <TextField
-                    label="판매가"
-                    name="GOODS_SELL_PRICE"
-                    value={goods.GOODS_SELL_PRICE}
-                    onChange={handleChange}
-                    margin="normal"
-                    type="number"
-                />
-                <TextField
-                    label="할인가"
-                    name="GOODS_SALE_PRICE"
-                    value={goods.GOODS_SALE_PRICE}
-                    onChange={handleChange}
-                    margin="normal"
-                    type="number"
-                />*/}
                 <TextField
                     label="날짜"
                     name="GOODS_DATE"
@@ -156,9 +130,10 @@ function AddGoods() {
                     fullWidth
                     margin="normal"
                     inputProps={{ multiple: true }}
+                    className={styles.textField_right}
                 />
                 <Button type="submit" variant="contained" color="primary">
-                    Add Goods
+                    작성
                 </Button>
             </form>
         </Container>

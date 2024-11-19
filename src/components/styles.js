@@ -1,7 +1,6 @@
 // src/components/styles.js
 import { styled } from '@mui/system';
 import {Box, Dialog, DialogTitle, TextField} from '@mui/material';
-import {blue} from "@mui/material/colors";
 
 export const Banner = styled(Box)(({ theme }) => ({
     height: '300px',

@@ -12,13 +12,13 @@ function Home() {
     return (
         <Container maxWidth="lg">
             {/* 배너 섹션 */}
-            <Banner>
+            <Banner sx={{marginTop: 5}} >
                 <Typography variant="h2" component="h1">
-                    WELCOME
+
                 </Typography>
             </Banner>
 
-            <Typography variant="h3" component="h2" gutterBottom>
+            <Typography variant="h3" component="h2" gutterBottom sx={{marginTop: 5, marginBottom:5}}>
                 최근게시물
             </Typography>
 
@@ -38,9 +38,6 @@ function Home() {
                                             <Typography variant="h5" component="div">
                                                 {good.GOODS_NAME}
                                             </Typography>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {good.GOODS_CONTENT}
-                                            </Typography>
                                         </CardContent>
                                         <Button size="small" component={RouterLink} to={`/goods/${good.GOODS_NO}`}>
                                             Learn More
@@ -50,8 +47,8 @@ function Home() {
                             ))
                         )
                 }
-
             </Grid>
+
         </Container>
     );
 }
