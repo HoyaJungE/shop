@@ -7,6 +7,7 @@ import {CKEditor} from "@ckeditor/ckeditor5-react";
 import {ClassicEditor} from "ckeditor5";
 import 'ckeditor5/ckeditor5.css';
 import styles from '../../css/board.module.css';
+import {textField_right} from "../../components/styles";
 
 function AddGoods() {
     const navigate = useNavigate();
@@ -54,6 +55,10 @@ function AddGoods() {
         } catch (error) {
             setError(error.message);
         }
+    };
+
+    const handleBackClick = () => {
+        navigate('/goods');
     };
 
 
@@ -123,17 +128,21 @@ function AddGoods() {
                     margin="normal"
                 />
                 <TextField
-                    label="첨부파일"
                     type="file"
                     name="files"
                     onChange={handleFileChange}
                     fullWidth
                     margin="normal"
                     inputProps={{ multiple: true }}
-                    className={styles.textField_right}
+                    sx={{
+
+                    }}
                 />
                 <Button type="submit" variant="contained" color="primary">
                     작성
+                </Button>
+                <Button variant="outlined" color="secondary" onClick={handleBackClick}>
+                    취소
                 </Button>
             </form>
         </Container>

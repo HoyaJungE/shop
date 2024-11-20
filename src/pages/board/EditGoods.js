@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { TextField, Button, Container, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import {StyledTextField} from "../../components/styles";
+import {
+    TextField,
+    Button,
+    Container,
+    Typography,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Box,
+    List, ListItem, ListItemText
+} from '@mui/material';
 import editorConfig from "../../components/editorConfig";
 import {CKEditor} from "@ckeditor/ckeditor5-react";
 import {ClassicEditor} from "ckeditor5";
 import 'ckeditor5/ckeditor5.css';
-import styles from '../../css/board.module.css';
+import {useQuery} from "react-query";
+import {fetchFilesByGoodsNo} from "../../api";
 
 function EditGoods() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [goods, setGoods] = useState({
+        GOODS_NO: '',
         GOODS_CATEGORY: '',
         GOODS_NAME: '',
         GOODS_CONTENT: '',
@@ -25,12 +37,14 @@ function EditGoods() {
     });
     const [goodsFiles, setGoodsFiles] = useState([]);
     const [error, setError] = useState('');
+    const { data: filesData, refetch, isLoading: filesLoading } = useQuery(['files', id], () => fetchFilesByGoodsNo(id));
 
     useEffect(() => {
         axios.get(`http://localhost:5000/api/goods/${id}`)
             .then(response => {
                 const data = response.data;
                 setGoods({
+                    GOODS_NO: data.GOODS_NO || '',
                     GOODS_CATEGORY: data.GOODS_CATEGORY || '',
                     GOODS_NAME: data.GOODS_NAME || '',
                     GOODS_CONTENT: data.GOODS_CONTENT || '',
@@ -45,12 +59,34 @@ function EditGoods() {
             .catch(error => setError(error.message));
     }, [id]);
 
+    useEffect(() => {
+        if (filesData) {
+            setGoodsFiles(filesData);
+        }
+    }, [filesData]);
+
     const handleChange = (event) => {
         const { name, value } = event.target;
         setGoods(prevState => ({
             ...prevState,
             [name]: value,
         }));
+    };
+
+    const handleDownload = (fileNo, fileSn) => {
+        window.location.href = `http://localhost:5000/api/file/download/${fileNo}/${fileSn}`;
+    };
+
+    const handleDelete = async (fileNo, fileSn) => {
+        try {
+            if(window.confirm("바로 삭제됩니다. 삭제하시겠습니까?")){
+                await axios.delete(`http://localhost:5000/api/file/delete/${fileNo}/${fileSn}`);
+                setGoodsFiles(prevFiles => prevFiles.filter(file => file.FILE_NO !== fileNo || file.FILE_SN !== fileSn));
+                refetch();
+            }
+        } catch (error) {
+            setError(error.message);
+        }
     };
 
     const handleFileChange = (event) => {
@@ -75,6 +111,10 @@ function EditGoods() {
         } catch (error) {
             setError(error.message);
         }
+    };
+
+    const handleBackClick = () => {
+        navigate(`/goods/${goods.GOODS_NO}`);
     };
 
     return (
@@ -142,8 +182,36 @@ function EditGoods() {
                     onChange={handleChange}
                     margin="normal"
                 />
+                {/* 기존 첨부파일 목록 */}
+                {filesData && filesData.length > 0 && (
+                    <Box mt={4}>
+                        <Typography variant="h6" component="h4" gutterBottom>
+                            기존 첨부파일
+                        </Typography>
+                        <List>
+                            {filesData.map((file, index) => (
+                                <ListItem key={index}>
+                                    <ListItemText primary={file.FILE_LOGIC_NM} />
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => handleDownload(file.FILE_NO, file.FILE_SN)}
+                                    >
+                                        다운로드
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handleDelete(file.FILE_NO, file.FILE_SN)}
+                                    >
+                                        삭제
+                                    </Button>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                )}
                 <TextField
-                    label="첨부파일"
                     type="file"
                     name="files"
                     onChange={handleFileChange}
@@ -151,8 +219,12 @@ function EditGoods() {
                     margin="normal"
                     inputProps={{ multiple: true }}
                 />
+
                 <Button type="submit" variant="contained" color="primary">
                     수정
+                </Button>
+                <Button variant="outlined" color="secondary" onClick={handleBackClick}>
+                    취소
                 </Button>
             </form>
         </Container>

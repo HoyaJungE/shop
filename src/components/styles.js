@@ -40,7 +40,3 @@ export const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
 }));
-
-export const StyledTextField = styled(TextField)(({ theme }) => ({
-    
-}));

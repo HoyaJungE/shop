@@ -171,3 +171,8 @@ export const deleteRoleMenu = async (roleMenu) => {
     const response = await axios.post(`${API_URL}/role/deleteRoleMenu`, roleMenu);
     return response.data;
 };
+
+export const deleteFile = async (roleMenu) => {
+    const response = await axios.post(`${API_URL}/file/deleteFile`, roleMenu);
+    return response.data;
+};
