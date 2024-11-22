@@ -24,14 +24,14 @@ function Login() {
 
     const mutation = useMutation(loginUser, {
         onSuccess: (data) => {
-            setMessage('Login successful! Redirecting to home...');
+            setMessage('로그인성공! 페이지이동중입니다..');
             login(data.user, data.token);
             setTimeout(() => {
                 navigate('/');
             }, 2000); // Redirect after 2 seconds
         },
         onError: (error) => {
-            setMessage('Login failed: ' + error.message);
+            setMessage('로그인실패: ' + error.message);
         },
     });
 

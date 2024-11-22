@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
@@ -6,10 +6,19 @@ import editorConfig from "../../components/editorConfig";
 import {CKEditor} from "@ckeditor/ckeditor5-react";
 import {ClassicEditor} from "ckeditor5";
 import 'ckeditor5/ckeditor5.css';
-import styles from '../../css/board.module.css';
-import {textField_right} from "../../components/styles";
+import AuthContext from "../../context/AuthContext";
+
 
 function AddGoods() {
+    const { user } = useContext(AuthContext);
+    useEffect(() => {
+        if (user && user.MEMBER_NO) {
+            setGoods(prevState => ({
+                ...prevState,
+                WRTER_NO: user.MEMBER_NO,
+            }));
+        }
+    }, [user]);
     const navigate = useNavigate();
     const [goods, setGoods] = useState({
         GOODS_CATEGORY: '',
@@ -21,6 +30,7 @@ function AddGoods() {
         GOODS_DATE: '',
         GOODS_KEYWORD: '',
         GOODS_THUMBNAIL: '',
+        WRTER_NO: '',
     });
     const [goodsFiles, setGoodsFiles] = useState([]);
     const [error, setError] = useState('');

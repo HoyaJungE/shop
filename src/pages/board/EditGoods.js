@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -19,8 +19,10 @@ import {ClassicEditor} from "ckeditor5";
 import 'ckeditor5/ckeditor5.css';
 import {useQuery} from "react-query";
 import {fetchFilesByGoodsNo} from "../../api";
+import AuthContext from "../../context/AuthContext";
 
 function EditGoods() {
+    const { user } = useContext(AuthContext);
     const { id } = useParams();
     const navigate = useNavigate();
     const [goods, setGoods] = useState({
@@ -34,6 +36,7 @@ function EditGoods() {
         GOODS_DATE: '',
         GOODS_KEYWORD: '',
         GOODS_THUMBNAIL: '',
+        WRTER_NO:'',
     });
     const [goodsFiles, setGoodsFiles] = useState([]);
     const [error, setError] = useState('');
@@ -181,6 +184,11 @@ function EditGoods() {
                     value={goods.GOODS_THUMBNAIL}
                     onChange={handleChange}
                     margin="normal"
+                />
+                <TextField
+                    type="hidden"
+                    name="WRTER_NO"
+                    value={user.MEMBER_ID}
                 />
                 {/* 기존 첨부파일 목록 */}
                 {filesData && filesData.length > 0 && (

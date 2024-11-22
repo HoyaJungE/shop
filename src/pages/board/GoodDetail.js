@@ -41,6 +41,9 @@ function GoodDetail() {
                             {data.GOODS_NAME}
                         </Typography>
                         <Typography variant="body1" gutterBottom cx={{ whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{ __html: data.GOODS_CONTENT }}></Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            작성자: {data.WRTER_NM}
+                        </Typography>
 
                         {filesData && filesData.length > 0 && (
                             <Box mt={4}>

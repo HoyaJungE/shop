@@ -69,7 +69,7 @@ function GoodsList() {
                                     {good.GOODS_NAME}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary">
-                                    Files: <FileCount goodsNo={good.GOODS_NO} />
+                                    작성자: {good.WRTER_NM}  첨부파일: <FileCount goodsNo={good.GOODS_NO} /> 개
                                 </Typography>
                             </CardContent>
                         </Card>
