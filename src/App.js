@@ -21,31 +21,37 @@ import RoleDetail from "./pages/role/RoleDetail";
 import EditRole from "./pages/role/EditRole";
 import ManageMemberRole from "./pages/role/ManageMemberRole";
 import ManageRoleMenu from "./pages/role/ManageRoleMenu";
+import LeftMenu from "./components/LeftMenu";
 
 function App() {
     return (
         <AuthProvider>
             <Router>
                 <Header />
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="login" element={<Login />} />
-                    <Route path="signup" element={<SignUp />} />
-                    <Route path="goods" element={<GoodsList />} />
-                    <Route path="add-goods" element={<AddGoods />} />
-                    <Route path="edit-goods/:id" element={<EditGoods />} />
-                    <Route path="goods/:id" element={<GoodDetail />} />
-                    <Route path="menus" element={<MenuList />} />
-                    <Route path="add-menu" element={<AddMenu />} />
-                    <Route path="menu/:id" element={<MenuDetail />} />
-                    <Route path="edit-menu/:id" element={<EditMenu />} />
-                    <Route path="add-role" element={<AddRole />} />
-                    <Route path="roles" element={<RoleList />} />
-                    <Route path="role/:id" element={<RoleDetail />} />
-                    <Route path="edit-role/:id" element={<EditRole />} />
-                    <Route path="/manageMemberRole" element={<ManageMemberRole />} />
-                    <Route path="/manageRoleMenu" element={<ManageRoleMenu />} />
-                </Routes>
+                <div style={{ display: 'flex' }}>
+                    <LeftMenu />
+                    <div style={{ flex: 1, padding: 20 }}>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="login" element={<Login />} />
+                            <Route path="signup" element={<SignUp />} />
+                            <Route path="goods" element={<GoodsList />} />
+                            <Route path="add-goods" element={<AddGoods />} />
+                            <Route path="edit-goods/:id" element={<EditGoods />} />
+                            <Route path="goods/:id" element={<GoodDetail />} />
+                            <Route path="menus" element={<MenuList />} />
+                            <Route path="add-menu" element={<AddMenu />} />
+                            <Route path="menu/:id" element={<MenuDetail />} />
+                            <Route path="edit-menu/:id" element={<EditMenu />} />
+                            <Route path="add-role" element={<AddRole />} />
+                            <Route path="roles" element={<RoleList />} />
+                            <Route path="role/:id" element={<RoleDetail />} />
+                            <Route path="edit-role/:id" element={<EditRole />} />
+                            <Route path="/manageMemberRole" element={<ManageMemberRole />} />
+                            <Route path="/manageRoleMenu" element={<ManageRoleMenu />} />
+                        </Routes>
+                    </div>
+                </div>
                 <Footer />
             </Router>
         </AuthProvider>
