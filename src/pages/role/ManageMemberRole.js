@@ -6,12 +6,19 @@ import {
     ListItem,
     ListItemText,
     List,
-    createSvgIcon
+    createSvgIcon,
+    Paper,
+    Button,
+    Grid,
+    ListItemIcon,
+    Checkbox
 } from '@mui/material';
 import CustomModal from "../../components/CustomModal";
 import {
     addMemberRole,
     deleteMemberRole,
+    addMemberRoleList,
+    deleteMemberRoleList,
     fetchMemberAll,
     fetchRoleMembers,
     fetchRoles
@@ -35,17 +42,72 @@ const ManageMemberRole = () => {
         'Minus'
     );
 
+    const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalContents, setModalContents] = useState(<></>);
-    const [roleMembers, setRoleMembers] = useState([]);
+    const [currentRoleNo, setCurrentRoleNo] = useState(null);
+    
     const [roles, setRoles] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [roleMembers, setRoleMembers] = useState([]);
     const [members, setMembers] = useState([]);
 
-    // roleMembers에 포함된 멤버를 제외한 members 리스트를 반환하는 함수
+    const [checked, setChecked] = useState([]);
+    const [left, setLeft] = useState([]);
+    const [right, setRight] = useState([]);
+    const leftChecked = intersection(checked, left);
+    const rightChecked = intersection(checked, right);
+
+    function not(a, b) {
+        return a.filter((value) => !b.some(item => item.MEMBER_NO === value.MEMBER_NO));
+    }
+
+    function intersection(a, b) {
+        return a.filter((value) => b.some(item => item.MEMBER_NO === value.MEMBER_NO));
+    }
+
     const filterOutRoleMembers = (members, roleMembers) => {
         const roleMemberNos = new Set(roleMembers.map(roleMember => roleMember.MEMBER_NO));
         return members.filter(member => !roleMemberNos.has(member.MEMBER_NO));
+    };
+
+    const handleToggle = (value) => (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const currentIndex = checked.findIndex(item => item.MEMBER_NO === value.MEMBER_NO);
+        const newChecked = [...checked];
+
+        if (currentIndex === -1) {
+            newChecked.push(value);
+            console.log(newChecked);
+        } else {
+            newChecked.splice(currentIndex, 1);
+            console.log(newChecked);
+        }
+
+        setChecked(newChecked);
+    };
+
+    const handleAllRight = () => {
+        setRight(right.concat(left));
+        setLeft([]);
+    };
+
+    const handleCheckedRight = () => {
+        setRight(right.concat(leftChecked));
+        setLeft(not(left, leftChecked));
+        setChecked(not(checked, leftChecked));
+    };
+
+    const handleCheckedLeft = () => {
+        setLeft(left.concat(rightChecked));
+        setRight(not(right, rightChecked));
+        setChecked(not(checked, rightChecked));
+    };
+
+    const handleAllLeft = () => {
+        setLeft(left.concat(right));
+        setRight([]);
     };
 
     const handleAddMemberRole = async (memberRole) => {
@@ -66,46 +128,170 @@ const ManageMemberRole = () => {
         }
     };
 
-    /* 클릭한 롤에대한 인원배정모달팝업을 띄운다. */
+    const handleSave = async () => {
+        try {
+            const originalMembers = await fetchRoleMembers(currentRoleNo);
+            const newMembers = right;
+
+            const membersToAdd = newMembers.filter(
+                member => !originalMembers.find(
+                    original => original.MEMBER_NO === member.MEMBER_NO
+                )
+            ).map(member => ({
+                MEMBER_NO: member.MEMBER_NO,
+                ROLE_NO: currentRoleNo
+            }));
+
+            const membersToDelete = originalMembers.filter(
+                original => !newMembers.find(
+                    member => member.MEMBER_NO === original.MEMBER_NO
+                )
+            ).map(member => ({
+                MEMBER_NO: member.MEMBER_NO,
+                ROLE_NO: currentRoleNo
+            }));
+
+            if (membersToAdd.length > 0) {
+                await addMemberRoleList(membersToAdd);
+            }
+            if (membersToDelete.length > 0) {
+                await deleteMemberRoleList(membersToDelete);
+            }
+
+            const updatedRoleMembers = await fetchRoleMembers(currentRoleNo);
+            const updatedMembers = await fetchMemberAll();
+            const updatedAvailableMembers = filterOutRoleMembers(updatedMembers, updatedRoleMembers);
+
+            setLeft(updatedAvailableMembers);
+            setRight(updatedRoleMembers);
+            setChecked([]);
+
+            setModalOpen(false);
+        } catch (error) {
+            console.error('Failed to save changes:', error);
+        }
+    };
+
+    const customList = (items) => (
+        <Paper sx={{ width: 200, height: 230, overflow: 'auto' }}>
+            <List dense component="div" role="list">
+                {items.map((value) => {
+                    const labelId = `transfer-list-item-${value.MEMBER_NO}-label`;
+                    
+                    const isChecked = checked.some(item => item.MEMBER_NO === value.MEMBER_NO);
+
+                    return (
+                        <ListItem
+                            key={value.MEMBER_NO}
+                            role="listitem"
+                            onClick={handleToggle(value)}
+                            component="button"
+                        >
+                            <ListItemIcon>
+                                <Checkbox
+                                    checked={isChecked}
+                                    tabIndex={-1}
+                                    disableRipple
+                                    inputProps={{
+                                        'aria-labelledby': labelId,
+                                    }}
+                                />
+                            </ListItemIcon>
+                            <ListItemText id={labelId} primary={value.MEMBER_ID} />
+                        </ListItem>
+                    );
+                })}
+            </List>
+        </Paper>
+    );
+
+    const updateModalContents = () => {
+        setModalContents(
+            <div>
+                <h4>권한 보유자 관리</h4>
+                <Grid container spacing={2} justifyContent="center" alignItems="center">
+                    <Grid item>{customList(left)}</Grid>
+                    <Grid item>
+                        <Grid container direction="column" alignItems="center">
+                            <Button
+                                sx={{ my: 0.5 }}
+                                variant="outlined"
+                                size="small"
+                                onClick={handleAllRight}
+                                disabled={left.length === 0}
+                                aria-label="move all right"
+                            >
+                                ≫
+                            </Button>
+                            <Button
+                                sx={{ my: 0.5 }}
+                                variant="outlined"
+                                size="small"
+                                onClick={handleCheckedRight}
+                                disabled={leftChecked.length === 0}
+                                aria-label="move selected right"
+                            >
+                                &gt;
+                            </Button>
+                            <Button
+                                sx={{ my: 0.5 }}
+                                variant="outlined"
+                                size="small"
+                                onClick={handleCheckedLeft}
+                                disabled={rightChecked.length === 0}
+                                aria-label="move selected left"
+                            >
+                                &lt;
+                            </Button>
+                            <Button
+                                sx={{ my: 0.5 }}
+                                variant="outlined"
+                                size="small"
+                                onClick={handleAllLeft}
+                                disabled={right.length === 0}
+                                aria-label="move all left"
+                            >
+                                ≪
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    <Grid item>{customList(right)}</Grid>
+                </Grid>
+                <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
+                    <Button 
+                        variant="contained" 
+                        onClick={handleSave}
+                        sx={{ mr: 1 }}
+                    >
+                        저장
+                    </Button>
+                    <Button 
+                        variant="outlined" 
+                        onClick={() => setModalOpen(false)}
+                    >
+                        취소
+                    </Button>
+                </Grid>
+            </div>
+        );
+    };
+
     const loadRoleMembers = async (roleNo) => {
         try {
-            const members = await fetchMemberAll();
             const roleMembers = await fetchRoleMembers(roleNo);
+            const members = await fetchMemberAll();
+            const availableMembers = filterOutRoleMembers(members, roleMembers);
 
-            // 중복되는 멤버를 제외한 members 리스트 생성
-            const filteredMembers = filterOutRoleMembers(members, roleMembers);
-
-            setMembers(filteredMembers);
+            setLeft(availableMembers);
+            setRight(roleMembers);
             setRoleMembers(roleMembers);
-            setModalContents(
-                <>
-                    <div>
-                        <h4>권한보유자</h4>
-                        <List>
-                            {roleMembers.map(roleMember => (
-                                <ListItem key={roleMember.MEMBER_NO} button>
-                                    <ListItemText primary={roleMember.MEMBER_ID} />
-                                    <MinusIcon onClick={() => handleDeleteMemberRole({ MEMBER_NO: roleMember.MEMBER_NO, ROLE_NO: roleNo })} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </div>
-                    <div>
-                        <h4>권한미보유자</h4>
-                        <List>
-                            {filteredMembers.map(member => (
-                                <ListItem key={member.MEMBER_NO} button>
-                                    <ListItemText primary={member.MEMBER_ID} />
-                                    <PlusIcon onClick={() => handleAddMemberRole({ MEMBER_NO: member.MEMBER_NO, ROLE_NO: roleNo })} />
-                                </ListItem>
-                            ))}
-                        </List>
-                    </div>
-                </>
-            );
+            setChecked([]);
+            setCurrentRoleNo(roleNo);
+            
+            updateModalContents();
             setModalOpen(true);
         } catch (error) {
-            console.error('Failed to fetch Roles:', error);
+            console.error('Failed to fetch role members:', error);
         }
     };
 
@@ -123,6 +309,12 @@ const ManageMemberRole = () => {
         loadRoles();
     }, []);
 
+    useEffect(() => {
+        if (modalOpen) {
+            updateModalContents();
+        }
+    }, [left, right, checked]);
+
     if (loading) {
         return <CircularProgress />;
     }
@@ -135,7 +327,7 @@ const ManageMemberRole = () => {
             <h2>권한목록</h2>
             <List>
                 {roles.map(role => (
-                    <ListItem key={role.ROLE_NO} button>
+                    <ListItem key={role.ROLE_NO} component="button">
                         <ListItemText primary={role.ROLE_NO} secondary={role.ROLE_NM} />
                         <PlusIcon onClick={() => loadRoleMembers(role.ROLE_NO)} />
                     </ListItem>

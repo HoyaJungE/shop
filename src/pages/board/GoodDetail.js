@@ -32,34 +32,56 @@ function GoodDetail() {
     return (
         <Container maxWidth="md">
             <Box mt={4}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h7" component="h6" cx={{ color: 'rgb(105,105,105)' }} gutterBottom>
-                            {data.GOODS_CATEGORY}
-                        </Typography>
-                        <Typography variant="h4" component="h2" gutterBottom>
+                <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+                    <CardContent sx={{ padding: 4 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                                {data.GOODS_CATEGORY}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                작성자: {data.WRTER_NM}
+                            </Typography>
+                        </Box>
+
+                        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4 }}>
                             {data.GOODS_NAME}
                         </Typography>
-                        <Typography variant="body1" gutterBottom cx={{ whiteSpace: 'pre-line'}} dangerouslySetInnerHTML={{ __html: data.GOODS_CONTENT }}></Typography>
-                        <Typography variant="body2" color="text.secondary">
-                            작성자: {data.WRTER_NM}
-                        </Typography>
+
+                        <Box sx={{ bgcolor: '#f5f5f5', p: 3, borderRadius: 1, mb: 4 }}>
+                            <Typography 
+                                variant="body1" 
+                                sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}
+                                dangerouslySetInnerHTML={{ __html: data.GOODS_CONTENT }}
+                            />
+                        </Box>
 
                         {filesData && filesData.length > 0 && (
-                            <Box mt={4}>
-                                <Typography variant="h6" component="h4" gutterBottom>
-                                    Attached Files
+                            <Box sx={{ bgcolor: '#f8f9fa', p: 3, borderRadius: 1, mb: 4 }}>
+                                <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+                                    첨부파일
                                 </Typography>
                                 <List>
                                     {filesData.map(file => (
-                                        <ListItem key={file.FILE_NO + '-' + file.FILE_SN}>
-                                            <ListItemText primary={file.FILE_LOGIC_NM} />
+                                        <ListItem 
+                                            key={file.FILE_NO + '-' + file.FILE_SN}
+                                            sx={{ 
+                                                bgcolor: 'white', 
+                                                mb: 1, 
+                                                borderRadius: 1,
+                                                '&:last-child': { mb: 0 }
+                                            }}
+                                        >
+                                            <ListItemText 
+                                                primary={file.FILE_LOGIC_NM}
+                                                sx={{ color: 'text.primary' }}
+                                            />
                                             <Button
-                                                variant="contained"
-                                                color="primary"
+                                                variant="outlined"
+                                                size="small"
                                                 onClick={() => handleDownload(file.FILE_NO, file.FILE_SN)}
+                                                sx={{ minWidth: '100px' }}
                                             >
-                                                Download
+                                                다운로드
                                             </Button>
                                         </ListItem>
                                     ))}
@@ -67,13 +89,21 @@ function GoodDetail() {
                             </Box>
                         )}
 
-                        <Box mt={2}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                             {user && (
-                                <Button variant="contained" color="primary" onClick={handleEditClick} style={{ marginRight: '10px' }}>
+                                <Button 
+                                    variant="contained" 
+                                    onClick={handleEditClick}
+                                    sx={{ minWidth: '100px' }}
+                                >
                                     수정
                                 </Button>
                             )}
-                            <Button variant="outlined" color="secondary" onClick={handleBackClick}>
+                            <Button 
+                                variant="outlined"
+                                onClick={handleBackClick}
+                                sx={{ minWidth: '100px' }}
+                            >
                                 목록
                             </Button>
                         </Box>

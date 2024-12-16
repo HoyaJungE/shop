@@ -10,14 +10,9 @@ import {
 } from '@mui/material';
 import CustomModal from "../../components/CustomModal";
 import {
-    addMemberRole,
-    deleteMemberRole,
-    fetchMemberAll,
     fetchMenus,
-    fetchRoleMembers,
     fetchRoles
 } from "../../api";
-import { Link as RouterLink } from "react-router-dom";
 
 const ManageRoleMenu = () => {
     const PlusIcon = createSvgIcon(
@@ -43,30 +38,40 @@ const ManageRoleMenu = () => {
     const [roleMenus, setRoleMenus] = useState([]);
 
     /* 클릭한 롤에대한 인원배정모달팝업을 띄운다. */
+    /* 클릭한 롤에대한 메뉴를 트리 구조로 모달에서 보여준다. */
     const loadRoleMenus = async (roleNo) => {
         try {
             const menus = await fetchMenus(roleNo);
 
-            setModalContents(
-                <>
-                    <div>
-                        <h4>권한보유자</h4>
-                        <List>
-                            {menus.map(menu => (
-                                <ListItem key={menu.MENU_ID} button>
-                                    <ListItemText primary={menu.MENU_NAME} />
-                                    <MinusIcon  />
-                                </ListItem>
-                            ))}
-                        </List>
+            // 재귀적으로 메뉴 트리를 렌더링하는 함수
+            const renderTree = (nodes) => (
+                <li key={nodes.MENU_ID} style={{ listStyle: 'none', margin: '5px 0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span>{nodes.MENU_NAME}</span>
+                        <MinusIcon />
                     </div>
-                </>
+                    {Array.isArray(nodes.children) && nodes.children.length > 0 && (
+                        <ul style={{ paddingLeft: 20 }}>
+                            {nodes.children.map((child) => renderTree(child))}
+                        </ul>
+                    )}
+                </li>
+            );
+
+            setModalContents(
+                <div>
+                    <h4>권한 보유자 메뉴</h4>
+                    <ul style={{ padding: 0 }}>
+                        {menus.map((menu) => renderTree(menu))}
+                    </ul>
+                </div>
             );
             setModalOpen(true);
         } catch (error) {
-            console.error('Failed to fetch Roles:', error);
+            console.error('Failed to fetch menus:', error);
         }
     };
+
 
     useEffect(() => {
         const loadRoles = async () => {
