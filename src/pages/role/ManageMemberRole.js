@@ -6,42 +6,37 @@ import {
     ListItem,
     ListItemText,
     List,
-    createSvgIcon,
     Paper,
     Button,
     Grid,
     ListItemIcon,
-    Checkbox
+    Checkbox,
+    Typography,
+    Card,
+    CardContent,
+    Divider,
+    Box,
+    IconButton,
+    Tooltip
 } from '@mui/material';
+import {
+    PersonAdd as PersonAddIcon,
+    PersonRemove as PersonRemoveIcon,
+    Security as SecurityIcon,
+    Group as GroupIcon
+} from '@mui/icons-material';
 import CustomModal from "../../components/CustomModal";
 import {
-    addMemberRole,
-    deleteMemberRole,
     addMemberRoleList,
     deleteMemberRoleList,
     fetchMemberAll,
     fetchRoleMembers,
-    fetchRoles
+    fetchRoles,
+    addMemberRole,
+    deleteMemberRole
 } from "../../api";
-import { Link as RouterLink } from "react-router-dom";
 
 const ManageMemberRole = () => {
-    const PlusIcon = createSvgIcon(
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <title>plus-circle</title>
-            <path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-        </svg>,
-        'Plus',
-    );
-
-    const MinusIcon = createSvgIcon(
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <title>minus-circle</title>
-            <path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-        </svg>,
-        'Minus'
-    );
-
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalContents, setModalContents] = useState(<></>);
@@ -151,117 +146,172 @@ const ManageMemberRole = () => {
                 ROLE_NO: currentRoleNo
             }));
 
+            let addResult, deleteResult;
+
             if (membersToAdd.length > 0) {
-                await addMemberRoleList(membersToAdd);
+                addResult = await addMemberRoleList(membersToAdd);
             }
             if (membersToDelete.length > 0) {
-                await deleteMemberRoleList(membersToDelete);
+                deleteResult = await deleteMemberRoleList(membersToDelete);
             }
 
-            const updatedRoleMembers = await fetchRoleMembers(currentRoleNo);
-            const updatedMembers = await fetchMemberAll();
-            const updatedAvailableMembers = filterOutRoleMembers(updatedMembers, updatedRoleMembers);
+            let message = [];
+            if (addResult) {
+                message.push(`${addResult.totalInserted}명 추가됨`);
+            }
+            if (deleteResult) {
+                message.push(`${deleteResult.totalDeleted}명 삭제됨`);
+            }
 
-            setLeft(updatedAvailableMembers);
-            setRight(updatedRoleMembers);
-            setChecked([]);
+            alert(message.join(', ') || '변경사항이 없습니다.');
 
             setModalOpen(false);
+            setLeft([]);
+            setRight([]);
+            setChecked([]);
+
         } catch (error) {
             console.error('Failed to save changes:', error);
+            alert('저장 중 오류가 발생했습니다.');
         }
     };
 
-    const customList = (items) => (
-        <Paper sx={{ width: 200, height: 230, overflow: 'auto' }}>
-            <List dense component="div" role="list">
-                {items.map((value) => {
-                    const labelId = `transfer-list-item-${value.MEMBER_NO}-label`;
-                    
-                    const isChecked = checked.some(item => item.MEMBER_NO === value.MEMBER_NO);
+    const customList = (items, title) => (
+        <Card sx={{ width: 350, height: 500, bgcolor: 'background.paper' }}>
+            <CardContent>
+                <Box sx={{ mb: 2 }}>
+                    <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center' }}>
+                        {title === '미배정 사용자' ? 
+                            <GroupIcon sx={{ mr: 1, color: 'text.secondary' }} /> : 
+                            <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
+                        }
+                        {title}
+                    </Typography>
+                    <Typography variant="subtitle2" color="text.secondary">
+                        총 {items.length}명
+                    </Typography>
+                </Box>
+                <Divider />
+                <Paper sx={{ 
+                    height: 380, 
+                    overflow: 'auto', 
+                    mt: 2,
+                    bgcolor: 'background.default'
+                }}>
+                    <List dense component="div" role="list">
+                        {items.map((value) => {
+                            const labelId = `transfer-list-item-${value.MEMBER_NO}-label`;
+                            const isChecked = checked.some(item => item.MEMBER_NO === value.MEMBER_NO);
 
-                    return (
-                        <ListItem
-                            key={value.MEMBER_NO}
-                            role="listitem"
-                            onClick={handleToggle(value)}
-                            component="button"
-                        >
-                            <ListItemIcon>
-                                <Checkbox
-                                    checked={isChecked}
-                                    tabIndex={-1}
-                                    disableRipple
-                                    inputProps={{
-                                        'aria-labelledby': labelId,
+                            return (
+                                <ListItem
+                                    key={value.MEMBER_NO}
+                                    role="listitem"
+                                    onClick={handleToggle(value)}
+                                    sx={{
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            bgcolor: 'action.hover',
+                                        },
+                                        borderBottom: '1px solid',
+                                        borderColor: 'divider'
                                     }}
-                                />
-                            </ListItemIcon>
-                            <ListItemText id={labelId} primary={value.MEMBER_ID} />
-                        </ListItem>
-                    );
-                })}
-            </List>
-        </Paper>
+                                >
+                                    <ListItemIcon>
+                                        <Checkbox
+                                            checked={isChecked}
+                                            tabIndex={-1}
+                                            disableRipple
+                                            color="primary"
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        id={labelId}
+                                        primary={
+                                            <Typography variant="subtitle1">
+                                                {value.MEMBER_ID}
+                                            </Typography>
+                                        }
+                                        secondary={
+                                            <Typography variant="body2" color="text.secondary">
+                                                {value.MEMBER_NAME || '이름 없음'}
+                                            </Typography>
+                                        }
+                                    />
+                                </ListItem>
+                            );
+                        })}
+                    </List>
+                </Paper>
+            </CardContent>
+        </Card>
     );
 
     const updateModalContents = () => {
         setModalContents(
-            <div>
-                <h4>권한 보유자 관리</h4>
-                <Grid container spacing={2} justifyContent="center" alignItems="center">
-                    <Grid item>{customList(left)}</Grid>
+            <Box sx={{ p: 2 }}>
+                <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                    <SecurityIcon sx={{ mr: 1 }} />
+                    권한 보유자 관리
+                </Typography>
+                <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 2 }}>
+                    <Grid item>{customList(left, '미배정 사용자')}</Grid>
                     <Grid item>
-                        <Grid container direction="column" alignItems="center">
-                            <Button
-                                sx={{ my: 0.5 }}
-                                variant="outlined"
-                                size="small"
-                                onClick={handleAllRight}
-                                disabled={left.length === 0}
-                                aria-label="move all right"
-                            >
-                                ≫
-                            </Button>
-                            <Button
-                                sx={{ my: 0.5 }}
-                                variant="outlined"
-                                size="small"
-                                onClick={handleCheckedRight}
-                                disabled={leftChecked.length === 0}
-                                aria-label="move selected right"
-                            >
-                                &gt;
-                            </Button>
-                            <Button
-                                sx={{ my: 0.5 }}
-                                variant="outlined"
-                                size="small"
-                                onClick={handleCheckedLeft}
-                                disabled={rightChecked.length === 0}
-                                aria-label="move selected left"
-                            >
-                                &lt;
-                            </Button>
-                            <Button
-                                sx={{ my: 0.5 }}
-                                variant="outlined"
-                                size="small"
-                                onClick={handleAllLeft}
-                                disabled={right.length === 0}
-                                aria-label="move all left"
-                            >
-                                ≪
-                            </Button>
+                        <Grid container direction="row" spacing={2}>
+                            <Grid item>
+                                <Tooltip title="모두 추가">
+                                    <IconButton
+                                        onClick={handleAllRight}
+                                        disabled={left.length === 0}
+                                        aria-label="move all right"
+                                    >
+                                        <PersonAddIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="선택 추가">
+                                    <IconButton
+                                        onClick={handleCheckedRight}
+                                        disabled={leftChecked.length === 0}
+                                        aria-label="move selected right"
+                                    >
+                                        <PersonAddIcon color="primary" />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="선택 제거">
+                                    <IconButton
+                                        onClick={handleCheckedLeft}
+                                        disabled={rightChecked.length === 0}
+                                        aria-label="move selected left"
+                                    >
+                                        <PersonRemoveIcon color="error" />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
+                            <Grid item>
+                                <Tooltip title="모두 제거">
+                                    <IconButton
+                                        onClick={handleAllLeft}
+                                        disabled={right.length === 0}
+                                        aria-label="move all left"
+                                    >
+                                        <PersonRemoveIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item>{customList(right)}</Grid>
+                    <Grid item>{customList(right, '권한 보유자')}</Grid>
                 </Grid>
-                <Grid container justifyContent="flex-end" sx={{ mt: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
                     <Button 
                         variant="contained" 
                         onClick={handleSave}
                         sx={{ mr: 1 }}
+                        color="primary"
                     >
                         저장
                     </Button>
@@ -271,8 +321,8 @@ const ManageMemberRole = () => {
                     >
                         취소
                     </Button>
-                </Grid>
-            </div>
+                </Box>
+            </Box>
         );
     };
 
@@ -321,18 +371,157 @@ const ManageMemberRole = () => {
 
     return (
         <Container>
-            <CustomModal title='Manage Member Role' open={modalOpen} onClose={() => setModalOpen(false)}>
-                {modalContents}
+            <CustomModal 
+                open={modalOpen} 
+                onClose={() => setModalOpen(false)}
+                maxWidth={false}
+                sx={{
+                    '& .MuiDialog-paper': {
+                        width: '90vw',
+                        maxWidth: '1400px',
+                        margin: '24px'
+                    }
+                }}
+            >
+                <Box sx={{ p: 3, width: '100%' }}>
+                    <Typography variant="h5" gutterBottom sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center',
+                        mb: 3 
+                    }}>
+                        <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
+                        권한 보유자 관리
+                    </Typography>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'row',
+                        justifyContent: 'center', 
+                        alignItems: 'center',
+                        gap: 2 
+                    }}>
+                        {customList(left, '미배정 사용자')}
+                        <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: 'row',
+                            gap: 1 
+                        }}>
+                            <Tooltip title="모두 추가">
+                                <span>
+                                    <IconButton
+                                        onClick={handleAllRight}
+                                        disabled={left.length === 0}
+                                        color="primary"
+                                        sx={{ border: 1, borderColor: 'divider' }}
+                                    >
+                                        <PersonAddIcon />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                            <Tooltip title="선택 추가">
+                                <span>
+                                    <IconButton
+                                        onClick={handleCheckedRight}
+                                        disabled={leftChecked.length === 0}
+                                        color="primary"
+                                        sx={{ border: 1, borderColor: 'divider' }}
+                                    >
+                                        <PersonAddIcon />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                            <Tooltip title="선택 제거">
+                                <span>
+                                    <IconButton
+                                        onClick={handleCheckedLeft}
+                                        disabled={rightChecked.length === 0}
+                                        color="error"
+                                        sx={{ border: 1, borderColor: 'divider' }}
+                                    >
+                                        <PersonRemoveIcon />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                            <Tooltip title="모두 제거">
+                                <span>
+                                    <IconButton
+                                        onClick={handleAllLeft}
+                                        disabled={right.length === 0}
+                                        color="error"
+                                        sx={{ border: 1, borderColor: 'divider' }}
+                                    >
+                                        <PersonRemoveIcon />
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
+                        </Box>
+                        {customList(right, '권한 보유자')}
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                        <Button 
+                            variant="contained" 
+                            onClick={handleSave}
+                            sx={{ mr: 1 }}
+                        >
+                            저장
+                        </Button>
+                        <Button 
+                            variant="outlined" 
+                            onClick={() => setModalOpen(false)}
+                        >
+                            취소
+                        </Button>
+                    </Box>
+                </Box>
             </CustomModal>
-            <h2>권한목록</h2>
-            <List>
-                {roles.map(role => (
-                    <ListItem key={role.ROLE_NO} component="button">
-                        <ListItemText primary={role.ROLE_NO} secondary={role.ROLE_NM} />
-                        <PlusIcon onClick={() => loadRoleMembers(role.ROLE_NO)} />
-                    </ListItem>
-                ))}
-            </List>
+            
+            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
+                <SecurityIcon sx={{ mr: 2, fontSize: 30, color: 'primary.main' }} />
+                <Typography variant="h4">권한 관리</Typography>
+            </Box>
+            
+            <Paper elevation={3} sx={{ p: 2 }}>
+                <List>
+                    {roles.map(role => (
+                        <ListItem
+                            key={role.ROLE_NO}
+                            sx={{
+                                mb: 1,
+                                border: 1,
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                '&:hover': {
+                                    bgcolor: 'action.hover',
+                                }
+                            }}
+                        >
+                            <ListItemIcon>
+                                <SecurityIcon color="primary" />
+                            </ListItemIcon>
+                            <ListItemText 
+                                primary={
+                                    <Typography variant="subtitle1" fontWeight="medium">
+                                        {role.ROLE_NM}
+                                    </Typography>
+                                }
+                                secondary={
+                                    <Typography variant="body2" color="text.secondary">
+                                        {role.ROLE_CN || '권한 설명 없음'}
+                                    </Typography>
+                                }
+                            />
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                startIcon={<PersonAddIcon />}
+                                onClick={() => loadRoleMembers(role.ROLE_NO)}
+                                sx={{ minWidth: 120 }}
+                            >
+                                권한 관리
+                            </Button>
+                        </ListItem>
+                    ))}
+                </List>
+            </Paper>
         </Container>
     );
 };

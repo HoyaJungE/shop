@@ -4,7 +4,7 @@ import {StyledDialog, StyledDialogTitle} from "./styles";
 import {DialogContent, IconButton} from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
-const CustomModal = ({ open = false, onClose, title, children }) => {
+const CustomModal = ({ open = false, onClose, title, children, maxWidth = false }) => {
 
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -18,7 +18,18 @@ const CustomModal = ({ open = false, onClose, title, children }) => {
     }, [open])
 
     return (
-        <StyledDialog open={modalVisible} onClose={closeModal}>
+        <StyledDialog 
+            open={modalVisible} 
+            onClose={closeModal}
+            maxWidth={maxWidth}
+            fullWidth
+            sx={{
+                '& .MuiDialog-paper': {
+                    width: '90vw',
+                    maxWidth: '1400px',
+                }
+            }}
+        >
             <StyledDialogTitle>
                 {title}
                 <IconButton onClick={closeModal}>
