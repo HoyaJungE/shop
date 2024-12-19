@@ -25,8 +25,8 @@ const CustomModal = ({ open = false, onClose, title, children, maxWidth = false 
             fullWidth
             sx={{
                 '& .MuiDialog-paper': {
-                    width: '90vw',
-                    maxWidth: '1400px',
+                    width: '80vw',
+                    maxWidth: '1200px',
                 }
             }}
         >

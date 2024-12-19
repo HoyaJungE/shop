@@ -22,8 +22,15 @@ import {
 import {
     PersonAdd as PersonAddIcon,
     PersonRemove as PersonRemoveIcon,
-    Security as SecurityIcon,
-    Group as GroupIcon
+    AdminPanelSettings as AdminPanelSettingsIcon,
+    Group as GroupIcon,
+    KeyboardDoubleArrowRight as KeyboardDoubleArrowRightIcon,
+    KeyboardDoubleArrowLeft as KeyboardDoubleArrowLeftIcon,
+    KeyboardArrowRight as KeyboardArrowRightIcon,
+    KeyboardArrowLeft as KeyboardArrowLeftIcon,
+    ManageAccounts as ManageAccountsIcon,
+    Assignment as AssignmentIcon,
+    AccountTree as AccountTreeIcon
 } from '@mui/icons-material';
 import CustomModal from "../../components/CustomModal";
 import {
@@ -183,7 +190,7 @@ const ManageMemberRole = () => {
                     <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center' }}>
                         {title === '미배정 사용자' ? 
                             <GroupIcon sx={{ mr: 1, color: 'text.secondary' }} /> : 
-                            <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
+                            <AdminPanelSettingsIcon sx={{ mr: 1, color: 'primary.main' }} />
                         }
                         {title}
                     </Typography>
@@ -251,7 +258,7 @@ const ManageMemberRole = () => {
         setModalContents(
             <Box sx={{ p: 2 }}>
                 <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-                    <SecurityIcon sx={{ mr: 1 }} />
+                    <AdminPanelSettingsIcon sx={{ mr: 1 }} />
                     권한 보유자 관리
                 </Typography>
                 <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 2 }}>
@@ -265,7 +272,7 @@ const ManageMemberRole = () => {
                                         disabled={left.length === 0}
                                         aria-label="move all right"
                                     >
-                                        <PersonAddIcon />
+                                        <KeyboardDoubleArrowRightIcon />
                                     </IconButton>
                                 </Tooltip>
                             </Grid>
@@ -276,7 +283,7 @@ const ManageMemberRole = () => {
                                         disabled={leftChecked.length === 0}
                                         aria-label="move selected right"
                                     >
-                                        <PersonAddIcon color="primary" />
+                                        <KeyboardArrowRightIcon color="primary" />
                                     </IconButton>
                                 </Tooltip>
                             </Grid>
@@ -287,7 +294,7 @@ const ManageMemberRole = () => {
                                         disabled={rightChecked.length === 0}
                                         aria-label="move selected left"
                                     >
-                                        <PersonRemoveIcon color="error" />
+                                        <KeyboardArrowLeftIcon color="error" />
                                     </IconButton>
                                 </Tooltip>
                             </Grid>
@@ -298,7 +305,7 @@ const ManageMemberRole = () => {
                                         disabled={right.length === 0}
                                         aria-label="move all left"
                                     >
-                                        <PersonRemoveIcon />
+                                        <KeyboardDoubleArrowLeftIcon />
                                     </IconButton>
                                 </Tooltip>
                             </Grid>
@@ -389,7 +396,7 @@ const ManageMemberRole = () => {
                         alignItems: 'center',
                         mb: 3 
                     }}>
-                        <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
+                        <AdminPanelSettingsIcon sx={{ mr: 1, color: 'primary.main' }} />
                         권한 보유자 관리
                     </Typography>
                     <Box sx={{ 
@@ -413,7 +420,7 @@ const ManageMemberRole = () => {
                                         color="primary"
                                         sx={{ border: 1, borderColor: 'divider' }}
                                     >
-                                        <PersonAddIcon />
+                                        <KeyboardDoubleArrowRightIcon />
                                     </IconButton>
                                 </span>
                             </Tooltip>
@@ -425,7 +432,7 @@ const ManageMemberRole = () => {
                                         color="primary"
                                         sx={{ border: 1, borderColor: 'divider' }}
                                     >
-                                        <PersonAddIcon />
+                                        <KeyboardArrowRightIcon />
                                     </IconButton>
                                 </span>
                             </Tooltip>
@@ -437,7 +444,7 @@ const ManageMemberRole = () => {
                                         color="error"
                                         sx={{ border: 1, borderColor: 'divider' }}
                                     >
-                                        <PersonRemoveIcon />
+                                        <KeyboardArrowLeftIcon />
                                     </IconButton>
                                 </span>
                             </Tooltip>
@@ -449,7 +456,7 @@ const ManageMemberRole = () => {
                                         color="error"
                                         sx={{ border: 1, borderColor: 'divider' }}
                                     >
-                                        <PersonRemoveIcon />
+                                        <KeyboardDoubleArrowLeftIcon />
                                     </IconButton>
                                 </span>
                             </Tooltip>
@@ -475,7 +482,7 @@ const ManageMemberRole = () => {
             </CustomModal>
             
             <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-                <SecurityIcon sx={{ mr: 2, fontSize: 30, color: 'primary.main' }} />
+                <AdminPanelSettingsIcon sx={{ mr: 2, fontSize: 30, color: 'primary.main' }} />
                 <Typography variant="h4">권한 관리</Typography>
             </Box>
             
@@ -495,7 +502,7 @@ const ManageMemberRole = () => {
                             }}
                         >
                             <ListItemIcon>
-                                <SecurityIcon color="primary" />
+                                <ManageAccountsIcon color="primary" />
                             </ListItemIcon>
                             <ListItemText 
                                 primary={
