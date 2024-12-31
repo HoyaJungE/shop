@@ -1,229 +1,141 @@
-// src/pages/Role/ManageRoleMenu.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Container,
     CircularProgress,
     Paper,
     Typography,
     Box,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemIcon,
-    Checkbox,
-    alpha,
     Button,
 } from '@mui/material';
 import {
-    FolderOutlined,
-    DescriptionOutlined,
-    ChevronRight,
-    ExpandMore,
-    Security as SecurityIcon,
-    Article,
-    Folder,
-    FolderOpen
+    Security as SecurityIcon
 } from '@mui/icons-material';
+import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+import { useTreeViewApiRef } from '@mui/x-tree-view/hooks';
 import CustomModal from "../../components/CustomModal";
 import { fetchMenus, fetchRoles } from "../../api";
-import TreeMenu from 'react-simple-tree-menu';
 
-const MenuTreeView = ({ menus }) => {
-    const [checkedItems, setCheckedItems] = useState({});
-    const [expandedItems, setExpandedItems] = useState({});
-    const [treeData, setTreeData] = useState(() => convertToTreeData(menus));
-    const [renderKey, setRenderKey] = useState(0);
+const prepareMenuTree = (menus) => {
+    const menuMap = new Map();
 
-    useEffect(() => {
-        console.log('Current expanded items:', expandedItems);
-        setRenderKey(prev => prev + 1);
-    }, [expandedItems]);
+    // 메뉴 데이터를 Map에 저장
+    menus.forEach(menu => {
+        menuMap.set(menu.MENU_NO, { ...menu, children: [] });
+    });
 
-    function convertToTreeData(menuItems) {
-        const menuMap = {};
-        const result = {};
+    // 부모-자식 관계 설정
+    menus.forEach(menu => {
+        if (menu.UPPR_MENU_NO != null) {
+            const parent = menuMap.get(menu.UPPR_MENU_NO);
+            if (parent) {
+                parent.children.push(menuMap.get(menu.MENU_NO));
+            }
+        }
+    });
 
-        menuItems.forEach(menu => {
-            menuMap[String(menu.MENU_NO)] = {
-                key: String(menu.MENU_NO),
-                label: menu.MENU_NAME,
-                url: menu.MENU_URL,
-                nodes: {}
-            };
-        });
+    // MUI_X_PRODUCTS 형식 변환
+    const convertToMUIFormat = (node) => ({
+        id: String(node.MENU_NO),
+        label: node.MENU_NAME,
+        children: node.children.length > 0
+            ? node.children.map(convertToMUIFormat)
+            : [],
+    });
 
-        menuItems.forEach(menu => {
-            const menuId = String(menu.MENU_NO);
-            const parentId = menu.UPPR_MENU_NO ? String(menu.UPPR_MENU_NO) : null;
+    // 루트 노드 설정 및 변환
+    const rootNodes = Array.from(menuMap.values()).filter(menu => menu.UPPR_MENU_NO == null);
+    return rootNodes.map(convertToMUIFormat);
+};
 
-            if (!parentId) {
-                result[menuId] = menuMap[menuId];
-            } else if (menuMap[parentId]) {
-                menuMap[parentId].nodes[menuId] = menuMap[menuId];
+function getItemDescendantsIds(item) {
+    const ids = [];
+    item.children?.forEach((child) => {
+        ids.push(child.id);
+        ids.push(...getItemDescendantsIds(child));
+    });
+    return ids;
+}
+
+const MenuTreeView = ({ menus, selectedItems, setSelectedItems }) => {
+    const toggledItemRef = useRef({});
+    const apiRef = useTreeViewApiRef();
+
+    const getAllItemIds = () => {
+        const ids = [];
+        const registerItemId = (item) => {
+            ids.push(item.id);
+            item.children?.forEach(registerItemId);
+        };
+        menus.forEach(registerItemId);
+        return ids;
+    };
+
+    const handleItemSelectionToggle = (event, itemId, isSelected) => {
+        toggledItemRef.current[itemId] = isSelected;
+    };
+
+    const handleSelectedItemsChange = (event, newSelectedItems) => {
+        setSelectedItems(newSelectedItems);
+
+        // Select / unselect the children of the toggled item
+        const itemsToSelect = [];
+        const itemsToUnSelect = {};
+        Object.entries(toggledItemRef.current).forEach(([itemId, isSelected]) => {
+            const item = apiRef.current.getItem(itemId);
+            if (isSelected) {
+                itemsToSelect.push(...getItemDescendantsIds(item));
+            } else {
+                getItemDescendantsIds(item).forEach((descendantId) => {
+                    itemsToUnSelect[descendantId] = true;
+                });
             }
         });
 
-        return result;
-    }
+        const newSelectedItemsWithChildren = Array.from(
+            new Set(
+                [...newSelectedItems, ...itemsToSelect].filter(
+                    (itemId) => !itemsToUnSelect[itemId],
+                ),
+            ),
+        );
 
-    const handleExpandAll = (expand) => {
-        const newExpandedItems = {};
-        
-        const collectNodes = (nodes) => {
-            Object.keys(nodes).forEach(key => {
-                newExpandedItems[key] = expand;
-                if (nodes[key].nodes && Object.keys(nodes[key].nodes).length > 0) {
-                    collectNodes(nodes[key].nodes);
-                }
-            });
-        };
+        setSelectedItems(newSelectedItemsWithChildren);
 
-        collectNodes(treeData);
-        
-        Promise.resolve().then(() => {
-            setExpandedItems(newExpandedItems);
-            setRenderKey(prev => prev + 1);
-        });
-    };
-
-    const getMenuIcon = (hasChildren, isOpen) => {
-        if (!hasChildren) {
-            return <Article fontSize="small" sx={{ color: 'text.secondary' }} />;
-        }
-        return isOpen ? 
-            <FolderOpen fontSize="small" sx={{ color: 'text.secondary' }} /> : 
-            <Folder fontSize="small" sx={{ color: 'text.secondary' }} />;
+        toggledItemRef.current = {};
     };
 
     return (
-        <Box sx={{ maxHeight: '60vh', overflow: 'auto' }}>
-            <Box sx={{ mb: 2, display: 'flex', gap: 1, borderBottom: 1, borderColor: 'divider', pb: 1 }}>
+        <Box>
+            <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
                 <Button
                     size="small"
-                    startIcon={<ExpandMore />}
-                    onClick={() => {
-                        console.log('Expand all clicked');
-                        handleExpandAll(true);
-                    }}
                     variant="outlined"
+                    onClick={() => setSelectedItems([])}
                 >
-                    전체 펼치기
+                    전체 선택 해제
                 </Button>
                 <Button
                     size="small"
-                    startIcon={<ChevronRight />}
-                    onClick={() => {
-                        console.log('Collapse all clicked');
-                        handleExpandAll(false);
-                    }}
                     variant="outlined"
+                    onClick={() => setSelectedItems(getAllItemIds())}
                 >
-                    전체 접기
+                    전체 선택
                 </Button>
             </Box>
-
-            <TreeMenu
-                key={renderKey}
-                data={treeData}
-                hasSearch={false}
-                expanded={expandedItems}
-                resetOpenNodesOnDataUpdate={false}
-                onClickItem={({ key, isOpen }) => {
-                    console.log('Node clicked:', key, 'current isOpen:', isOpen);
-                    setExpandedItems(prev => ({
-                        ...prev,
-                        [key]: !isOpen
-                    }));
-                }}
-            >
-                {({ items }) => (
-                    <List>
-                        {items.map(({ key, level, isOpen, label, nodes, toggleNode }) => {
-                            const hasChildren = nodes && Object.keys(nodes).length > 0;
-
-                            return (
-                                <ListItem
-                                    key={key}
-                                    sx={{
-                                        pl: level * 3,
-                                        py: 0.5,
-                                        '&:hover': {
-                                            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-                                            borderRadius: 1,
-                                        },
-                                        transition: 'all 0.2s',
-                                        borderRadius: 1,
-                                        mb: 0.5,
-                                    }}
-                                >
-                                    <Box 
-                                        onClick={toggleNode}
-                                        sx={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center',
-                                            minWidth: 32,
-                                            color: 'text.secondary',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        {hasChildren && (
-                                            isOpen ? <ExpandMore fontSize="small" /> : <ChevronRight fontSize="small" />
-                                        )}
-                                    </Box>
-                                    <ListItemIcon 
-                                        onClick={toggleNode}
-                                        sx={{ 
-                                            minWidth: 36,
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        {getMenuIcon(hasChildren, isOpen)}
-                                    </ListItemIcon>
-                                    <ListItemText
-                                        primary={
-                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <Checkbox
-                                                    size="small"
-                                                    checked={checkedItems[key] || false}
-                                                    onChange={(e) => {
-                                                        e.stopPropagation();
-                                                        setCheckedItems(prev => ({
-                                                            ...prev,
-                                                            [key]: e.target.checked
-                                                        }));
-                                                    }}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    sx={{ 
-                                                        mr: 1,
-                                                        '& .MuiSvgIcon-root': {
-                                                            fontSize: 20
-                                                        }
-                                                    }}
-                                                />
-                                                <Typography
-                                                    onClick={toggleNode}
-                                                    variant="body2"
-                                                    sx={{
-                                                        fontWeight: hasChildren ? 500 : 400,
-                                                        color: hasChildren ? 'text.primary' : 'text.secondary',
-                                                        fontSize: '0.875rem',
-                                                        cursor: 'pointer'
-                                                    }}
-                                                >
-                                                    {label}
-                                                </Typography>
-                                            </Box>
-                                        }
-                                        sx={{ m: 0 }}
-                                    />
-                                </ListItem>
-                            );
-                        })}
-                    </List>
-                )}
-            </TreeMenu>
+            {menus.length > 0 ? (
+                <RichTreeView
+                    items={menus}
+                    selectedItems={selectedItems}
+                    onSelectedItemsChange={handleSelectedItemsChange}
+                    onItemSelectionToggle={handleItemSelectionToggle}
+                    multiSelect
+                    checkboxSelection
+                    apiRef={apiRef}
+                    sx={{ padding: 2, bgcolor: 'background.paper', borderRadius: 1 }}
+                />
+            ) : (
+                <Typography>루트 메뉴가 없습니다. 데이터를 확인해주세요.</Typography>
+            )}
         </Box>
     );
 };
@@ -231,6 +143,7 @@ const MenuTreeView = ({ menus }) => {
 const ManageRoleMenu = () => {
     const [menus, setMenus] = useState([]);
     const [roles, setRoles] = useState([]);
+    const [selectedItems, setSelectedItems] = useState([]); // 선택된 메뉴 상태
     const [loading, setLoading] = useState(true);
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedRole, setSelectedRole] = useState(null);
@@ -241,6 +154,8 @@ const ManageRoleMenu = () => {
             const response = await fetchRoles();
             if (response && Array.isArray(response)) {
                 setRoles(response);
+            } else {
+                console.error("Roles API returned invalid data.");
             }
         } catch (error) {
             console.error('권한 로드 실패:', error);
@@ -255,25 +170,33 @@ const ManageRoleMenu = () => {
             console.log('선택된 권한:', role);
 
             const response = await fetchMenus();
-            console.log('메뉴 응답:', response);
-            
+            console.log('FetchMenus Response:', response);
+
             if (Array.isArray(response)) {
-                // 유효한 메뉴 데이터만 필터링
                 const validMenus = response.filter(menu => menu && menu.MENU_NO);
-                console.log('유효한 메뉴:', validMenus);
-                
-                setMenus(validMenus);
+                console.log('Valid Menus:', validMenus);
+
+                setMenus(prepareMenuTree(validMenus));
+                setSelectedItems([]); // 선택 상태 초기화
+
                 setSelectedRole({
                     ROLE_NO: role.ROLE_NO,
-                    ROLE_NAME: role.ROLE_NAME
+                    ROLE_NAME: role.ROLE_NAME,
                 });
+
                 setModalOpen(true);
+            } else {
+                console.error("Menus API returned invalid data.");
             }
         } catch (error) {
             console.error('메뉴 로드 실패:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleShowSelectedMenus = () => {
+        console.log("선택된 메뉴 번호:", selectedItems.join(","));
     };
 
     useEffect(() => {
@@ -294,28 +217,27 @@ const ManageRoleMenu = () => {
                 <Typography variant="h6" gutterBottom>
                     권한별 메뉴 관리
                 </Typography>
-                <List>
-                    {roles.map((role) => (
-                        <ListItem
-                            key={role.ROLE_NO}
-                            component="button"
-                            onClick={() => handleRoleClick(role)}
-                            sx={{
-                                '&:hover': {
-                                    bgcolor: 'action.hover',
-                                },
-                            }}
-                        >
-                            <ListItemIcon>
-                                <SecurityIcon color="primary" />
-                            </ListItemIcon>
-                            <ListItemText 
-                                primary={role.ROLE_NAME}
-                                secondary={role.ROLE_DESC || '설명 없음'}
-                            />
-                        </ListItem>
-                    ))}
-                </List>
+                {roles.map((role) => (
+                    <Box
+                        key={role.ROLE_NO}
+                        onClick={() => handleRoleClick(role)}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            mb: 1,
+                            p: 1,
+                            bgcolor: 'action.hover',
+                            borderRadius: 1,
+                            cursor: 'pointer',
+                            '&:hover': {
+                                bgcolor: 'action.selected',
+                            },
+                        }}
+                    >
+                        <SecurityIcon color="primary" sx={{ mr: 2 }} />
+                        <Typography>{role.ROLE_NM}</Typography>
+                    </Box>
+                ))}
             </Paper>
 
             <CustomModal
@@ -325,12 +247,21 @@ const ManageRoleMenu = () => {
             >
                 <Box sx={{ minHeight: '60vh', maxHeight: '70vh', overflow: 'auto' }}>
                     <Paper elevation={0} sx={{ bgcolor: 'background.default', p: 2 }}>
-                        {loading ? (
-                            <Box display="flex" justifyContent="center">
-                                <CircularProgress />
-                            </Box>
-                        ) : menus && menus.length > 0 ? (
-                            <MenuTreeView menus={menus} />
+                        {menus.length > 0 ? (
+                            <>
+                                <MenuTreeView
+                                    menus={menus}
+                                    selectedItems={selectedItems}
+                                    setSelectedItems={setSelectedItems}
+                                />
+                                <Button
+                                    variant="contained"
+                                    onClick={handleShowSelectedMenus}
+                                    sx={{ mt: 2 }}
+                                >
+                                    선택된 메뉴 확인
+                                </Button>
+                            </>
                         ) : (
                             <Typography>메뉴 데이터가 없습니다.</Typography>
                         )}

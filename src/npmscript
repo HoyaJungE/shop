@@ -50,3 +50,7 @@ npm install @mui/x-tree-view
 npm install @mui/x-tree-view@latest
 
 npm install react-simple-tree-menu
+
+
+npm install @mui/lab --legacy-peer-deps
+npm install @mui/x-tree-view --legacy-peer-deps
